@@ -16,10 +16,10 @@ mysql.paramstyle = "format"
 
 cursor = mysql.cursor()
 
-myAStar = astar("Halaima", "Jita")
+myAStar = astar("Jita", "Halaima")
 route = myAStar.getRoute()
 
-newNode = node("Jita")
-print(newNode.ID)
+#newNode = node("Jita")
+#print(newNode.ID)
 
 cursor.close()
