@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
 import MySQLdb
+import distance_calc
 from distance_calc import *
+
+distance_calc.debugLevel = 1
 
 mysql_opts = { 
     'host': "localhost", 
@@ -18,8 +21,6 @@ cursor = mysql.cursor()
 
 myAStar = astar("Jita", "Halaima")
 route = myAStar.getRoute()
-
-#newNode = node("Jita")
-#print(newNode.ID)
-
+for names in route:
+    print names
 cursor.close()
