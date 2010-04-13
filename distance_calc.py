@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 import MySQLdb
-
-import MySQLdb
 import sys
 
 debugLevel = 0
@@ -51,10 +49,10 @@ class node:
         trace = []
         node = self
         while(node.predecessor != None):
-            trace.append(node.name)
+            trace.insert(0, node.name)
             node = node.predecessor
-        trace.append(node.name)
-        return trace
+        trace.insert(0, node.name)
+        return (trace)
     
     def printNode(self):
         print("%s (%i)" % (self.name, self.ID))
@@ -119,14 +117,17 @@ class myList:
 class astar:
     """a* calculation based on coordinates"""
 
-    def __init__(self, startName, destName):
+    def __init__(self):
+        pass
+    
+    def newRoute(self, startName, destName):
         self.startNode = node(startName)
         self.destNode = node(destName)
         self.openList = myList()
         self.closedList = myList()
         self.currentNode = None
         self.currentDist = 0
-        
+    
     def getRoute(self):
         global debugLevel
         self.openList.add(self.startNode, 0)
