@@ -1,5 +1,5 @@
 <?php
-    echo "<form action=".$PHP_SELF."?func=pos method=POST>\n";
+    echo "<form action=".$PHP_SELF."?func=".$function." method=POST>\n";
 ?>
 
 <select name=tower>

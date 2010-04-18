@@ -1,5 +1,6 @@
 <?php
-    $functions = array("about" => "about", "ice" => "Ice Calculation", "pos" => "POS Refill Calculation");
+    $functions = array("about" => "about", "ice" => "Ice Calculation", "pos" => "POS Refill Calculation",
+                       "station" => "Station Locator", "agent" => "Agent Locator");
     $function = $_GET["func"];
     
     $dbLink = mysql_connect("localhost", "root", "")
@@ -44,9 +45,17 @@
             {
                 include("ice.php");
             }
-           if ($function == "pos")
+            if ($function == "pos")
             {
                 include("pos.php");
+            }
+            if ($function == "station")
+            {
+                include("station.php");
+            }
+            if ($function == "agent")
+            {
+                include("agent.php");
             }
         ?>
     

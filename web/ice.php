@@ -9,7 +9,7 @@
               ORDER BY typeName";
     $result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
     echo $_POST["calculate"];
-    echo "<form action=".$PHP_SELF."?func=ice method=POST>";
+    echo "<form action=".$PHP_SELF."?func=".$function." method=POST>";
     
 ?>
 
