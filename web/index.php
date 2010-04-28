@@ -1,12 +1,58 @@
 <?php
-    $functions = array("about" => "about", "ice" => "Ice Calculation", "pos" => "POS Refill Calculation",
-                       "station" => "Station Locator", "agent" => "Agent Locator");
-    $function = $_GET["func"];
+
+    class siteFunctions
+    {
+        function siteFunctions($functions)
+        {
+            $this->functions = $functions;
+        }
+        
+        function printFunctions()
+        {
+            $i = 0;
+            foreach($this->functions as $key => $value)
+            {
+                echo "<a href=".$PHP_SELF."?func=".$key.">".$value[0]."</a>";
+                $i++;
+                if ($i < sizeof($this->functions))
+                {
+                    echo " | ";
+                }
+            }
+        }
+        
+        function getFile($currentFunction)
+        {
+            return $this->functions[$currentFunction][1];
+        }
+    }
     
-    $dbLink = mysql_connect("localhost", "root", "")
-        or die("Keine Verbindung möglich: " . mysql_error());
-    mysql_select_db("eve_online")
-        or die("Auswahl der Datenbank fehlgeschlagen");
+    class dbLink
+    {
+        function dbLink($host, $user, $pass, $table)
+        {
+            $this->link = mysql_connect($host, $user, $pass)
+                          or die("Keine Verbindung möglich: " . mysql_error());
+            mysql_select_db($table)
+            or die("Auswahl der Datenbank fehlgeschlagen");
+        }
+        
+        function query($query)
+        {
+            $this->result = mysql_query($query)
+                            or die($query."\n".mysql_error());
+        }
+    }
+    
+    $functions = array("about" => array("about", "about.php"),
+                       "ice" => array("Ice Calculation", "ice.php"),
+                       "pos" => array("POS Refill Calculation", "pos.php"),
+                       "station" => array("Station Locator", "station.php"),
+                       "agent" => array("Agent Locator", "agent.php"));
+    
+    $db = new dbLink("localhost", "root", "", "eve_online");
+    $siteFunctions = new siteFunctions($functions);
+    $currentFunction = $_GET["func"];
 ?>
 
 <html>
@@ -16,46 +62,11 @@
     <body>
     <!-- MENU -->
         <?php
-            $i = 0;
-            foreach($functions as $key => $value)
-            {
-                echo "<a href=".$PHP_SELF."?func=".$key.">".$value."</a>";
-                $i++;
-                if ($i < sizeof($functions))
-                {
-                    echo " | ";
-                }
-            }
+            $siteFunctions->printFunctions();
             echo "<br><br>";
-        ?>
-        
-    <!--ABOUT-->
-        <?php
-            if ($function == "about")
+            if ($siteFunctions->getFile($currentFunction) != "")
             {
-        ?>
-            Developing Eve Tools since 2010.
-        <?php
-            }
-        ?>
-    
-    <!--Function File-->
-        <?php
-            if ($function == "ice")
-            {
-                include("ice.php");
-            }
-            if ($function == "pos")
-            {
-                include("pos.php");
-            }
-            if ($function == "station")
-            {
-                include("station.php");
-            }
-            if ($function == "agent")
-            {
-                include("agent.php");
+                include($siteFunctions->getFile($currentFunction));                
             }
         ?>
     
@@ -65,5 +76,5 @@
 
 <?php
     //FREE MYSQL CONNECTION
-    mysql_close($dbLink);
+    mysql_close($db->link);
 ?>
