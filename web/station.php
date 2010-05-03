@@ -1,6 +1,6 @@
 <?php
     $submit = $_POST["submit"];
-    $locationID = $_POST["location"];
+    $locationName = $_POST["location"];
     $selectedCorpID = $_POST["corp"];
     $medical = $_POST["medical"];
     $jumpclone = $_POST["jumpclone"];
@@ -181,7 +181,7 @@
         {
             $query = $query. "ORDER BY stationName ASC";
         }
-        $result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
+        //$result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
     }
 
     echo "Location: <input type=text value='".$location."' name=location>";

@@ -69,7 +69,7 @@ calcEnd = idtoint[result[0][0]]
 print ("Calculating from %i to %i" % (inttoid[calcStart], inttoid[calcEnd]))
 
 #start bellman ford
-for startSystem in range(calcStart, calcEnd):
+for startSystem in range(calcStart, calcEnd + 1):
     startTime = clock()
     calcSystems = deepcopy(systems)
     calcSystems[startSystem][1] = 0
