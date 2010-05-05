@@ -19,6 +19,8 @@ if ($mode == "track")
 else
 {
     $tracker->inventionStatus();
+    echo "<br>";
+    $tracker->productionStatus();
 }
 
 ?>

@@ -176,7 +176,7 @@ class pecoTracker
     
     function printInventions($startTime, $endTime)
     {
-        echo "<u>Invention Report for Week ".date("W", $startTime)."</u><br>";
+        echo "<b><u>Invention Report for Week ".date("W", $startTime)."</u></b><br>";
         echo "(".date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime).")</u><br><br>";
         
         $query = "SELECT memberName, installerID, count(*), sum(completedStatus)
@@ -196,7 +196,7 @@ class pecoTracker
         {
             while($line = mysql_fetch_assoc($this->db->result))
             {
-                echo "<b>".$line["memberName"]."</b>: ";
+                echo "<u>".$line["memberName"]."</u>: ";
                 echo $line["count(*)"]." Inventions ";
                 echo "(".round($line["sum(completedStatus)"] / $line["count(*)"] * 100, 2)."% success)<br>\n";
                 
@@ -214,10 +214,76 @@ class pecoTracker
         }
     }
     
+    function printProductions($startTime, $endTime)
+    {
+        $buildingSlots = 10;
+        echo "<b><u>Production Report for Week ".date("W", $startTime)."</u></b><br>";
+        echo "(".date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime).")</u><br><br>";
+        
+        //select jobs interfering the the selected timeframe
+        $query = "SELECT memberName, installerID, endProductionTime, beginProductionTime, metaGroupID
+                  FROM pecoActivityTracking AS t1, pecoMemberID AS t2, invMetaTypes AS t3
+                  WHERE t1.installerID = t2.memberID
+                  AND
+                  (
+                    beginProductionTime BETWEEN '".date("o-m-d H:i:s", $startTime)."'
+                                        AND '".date("o-m-d H:i:s", $endTime)."'
+                    OR
+                    endProductionTime BETWEEN '".date("o-m-d H:i:s", $startTime)."'
+                                      AND '".date("o-m-d H:i:s", $endTime)."'
+                    OR
+                    (
+                        beginProductionTime < '".date("o-m-d H:i:s", $startTime)."'
+                        AND
+                        endProductionTime > '".date("o-m-d H:i:s", $endTime)."'
+                    )
+                  )
+                  AND t1.outputTypeID = t3.typeID
+                  AND metaGroupID = 2
+                  AND activityID = ".$this->productionID."
+                  ORDER BY memberName";
+        $this->db->query($query);
+        
+        //echo "<b><i><br>".$query."</i></b><br>";
+        
+        $totalProductions = 0;
+        
+        if (mysql_num_rows($this->db->result) > 0)
+        {
+            while($line = mysql_fetch_assoc($this->db->result))
+            {
+                $startProductionTime = strtotime($line["beginProductionTime"]);
+                $endProductionTime = strtotime($line["endProductionTime"]);
+                $name = $line["memberName"];
+                
+                $output[$name]["count"] += 1;
+                if ($startProductionTime < $startTime)
+                    $startProductionTime = $startTime;
+                if ($endProductionTime > $endTime)
+                    $endProductionTime = $endTime;
+                
+                $output[$name]["duration"] += $endProductionTime - $startProductionTime;
+            }
+            
+            foreach($output as $key => $value)
+            {
+                echo "<u>".$key."</u>: ";
+                echo $value["count"]." Productions ";
+                echo "(".round($value["duration"] / ($buildingSlots * ($endTime - $startTime)) * 100, 2)."%, ";
+                echo "utilization)<br>";
+            }
+            
+            //echo "<br><b>Total</b>: ";
+            //echo $totalProductions." Productions ";
+        }
+        else
+        {
+            echo "<b>No production happened.</b><br>";
+        }
+    }
+    
     function inventionStatus()
     {
-        global $config;
-        
         //Select timeframe for this week and last week
         
         $now = time();
@@ -234,6 +300,24 @@ class pecoTracker
         $this->printInventions($currentWeekStart, $currentWeekEnd);
         echo "<br><br>";
         $this->printInventions($lastWeekStart, $lastWeekEnd);
+    }
+    
+    function ProductionStatus()
+    {
+        $now = time();
+        $weekday = date("N", $now);
+        $hour = date("H", $now);
+        $minute = date("i", $now);
+        $seconds = date("s", $now);
+        
+        $currentWeekStart = $now - $seconds - ($minute * 60) - ($hour * 60 * 60) - (($weekday - 1) * 60 * 60 * 24);
+        $currentWeekEnd = $currentWeekStart + (7 * 24 * 60 * 60) - 1;
+        $lastWeekStart = $currentWeekStart - (7 * 24 * 60 * 60);
+        $lastWeekEnd = $currentWeekEnd - (7 * 24 * 60 * 60);
+        
+        $this->printProductions($currentWeekStart, $currentWeekEnd);
+        echo "<br><br>";
+        $this->printProductions($lastWeekStart, $lastWeekEnd);
     }
     
     function setupTables()
