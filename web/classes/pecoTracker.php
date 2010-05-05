@@ -3,6 +3,8 @@ class pecoTracker
 {
     function __construct($userID, $apiKey, $charName, $dbLink)
     {
+        global $config;
+        
         try
         {   
             $this->ale = AleFactory::getEVEOnline();
@@ -35,13 +37,19 @@ class pecoTracker
                           WHERE activityName = 'Invention'");
         $inventionID = mysql_fetch_assoc($this->db->result);
         $this->inventionID = $inventionID["activityID"];
+        
+        $this->db->query("SELECT activityID
+                          FROM ramactivities
+                          WHERE activityName = 'Manufacturing'");
+        $productionID = mysql_fetch_assoc($this->db->result);
+        $this->productionID = $productionID["activityID"];        
     }
     
-    function inventionAlreadyTracked($inventionID)
+    function jobAlreadyTracked($jobID)
     {
         $this->db->query("SELECT *
-                          FROM pecoInvention
-                          WHERE inventionID = ".$inventionID);
+                          FROM pecoActivityTracking
+                          WHERE jobID = ".$jobID);
         if (mysql_numrows($this->db->result) == 0)
         {
             return false;
@@ -51,12 +59,14 @@ class pecoTracker
             return true;
         }
     }
-    
+
     function updateMembers()
     {
-        $query = "SELECT distinct inventorID
-                  FROM pecoInvention
-                  WHERE inventorID NOT IN (
+        echo "<u>User Update</u><br><br>\n";
+        
+        $query = "SELECT distinct installerID
+                  FROM pecoActivityTracking
+                  WHERE installerID NOT IN (
                       SELECT memberID
                       FROM pecoMemberID)";
         $this->db->query($query);
@@ -67,10 +77,9 @@ class pecoTracker
             while($line = mysql_fetch_assoc($this->db->result))
             {
                 //echo "fetching ".$line["inventorID"]."<br>\n";
-                $charIDs["ids"][] = $line["inventorID"];
+                $charIDs["ids"][] = $line["installerID"];
             }
             $charNames = $this->ale->eve->CharacterName($charIDs);
-            print_r($charNames);
             foreach($charNames->result->characters as $charName)
             {
                 $query = "INSERT INTO pecoMemberID
@@ -85,45 +94,60 @@ class pecoTracker
         }
     }
     
-    function trackInvention()
+    function track()
     {
         try
         {
             $corpJobs = $this->ale->corp->IndustryJobs();
             //print_r($corpJobs);
             
-            $count = 0;
-            $countSuccessfully = 0;
-            $countCompleted = 0;
-            
-            echo "<u>INVENTION</u><br><br>\n";
+            echo "<u>Tracking</u><br><br>\n";
+            $now = time();
             
             foreach ($corpJobs->result->jobs as $job)
             {
-                if ($job->activityID == $this->inventionID)
+                $query = "INSERT INTO pecoActivityTracking VALUES (";
+                $query = $query.$job->jobID.","; //jobID
+                $query = $query.$job->activityID.", "; //activityID
+                $query = $query.$job->installerID.","; //installerID
+                $query = $query."'".$job->beginProductionTime."',"; //beginProductionTime
+                $query = $query."'".$job->endProductionTime."',"; //endProductionTime
+                $query = $query."'".date("o-m-d H:i:s", $now)."',"; //entryDate
+                $query = $query.$job->outputTypeID.","; //outputTypeID
+                $query = $query.$job->completedStatus.")"; //Inventionsuccess
+                
+                if (($job->activityID == $this->inventionID) || ($job->activityID == $this->productionID))
                 {
-                    $count++;
+                    if ($job->activityID == $this->inventionID)
+                        echo "Invention | ";
+                    elseif ($job->activityID == $this->productionID)
+                        echo "Production | ";
+                    
                     echo "JobID: ".$job->jobID." (".$job->beginProductionTime." - ".$job->endProductionTime.") by ".$job->installerID;
                     
-                    if ($job->completed)
+                    if (($job->completed) && ($job->activityID == $this->inventionID))
                     {
-                        //enter the completed jobs to the DB
-                        $countCompleted++;
+                        //enter the completed invention jobs to the DB
                         echo " completed";
                         if ($job->completedStatus)
                         {
-                            $countSuccessfully++;
                             echo " successfully";
                         }
 
-                        if (!$this->inventionAlreadyTracked($job->jobID))
+                        if (!$this->jobAlreadyTracked($job->jobID))
                         {
-                            $query = "INSERT INTO pecoInvention VALUES (";
-                            $query = $query.$job->jobID.",";
-                            $query = $query.$job->installerID.",";
-                            $query = $query."'".date("o-m-d H:i:s")."',";
-                            $query = $query.$job->outputTypeID.",";
-                            $query = $query.$job->completedStatus.")";
+                            $this->db->query($query);
+                            echo " | entered";
+                        }
+                        else
+                        {
+                            echo " | already tracked";
+                        }
+                    }
+                    elseif($job->activityID == $this->productionID)
+                    {
+                        if (!$this->jobAlreadyTracked($job->jobID))
+                        {
                             $this->db->query($query);
                             echo " | entered";
                         }
@@ -134,17 +158,14 @@ class pecoTracker
                     }
                     else
                     {
-                        echo "in progress ...";
+                        echo " in progress ...";
                     }
                     echo "<br> \n";
                 }
             }
-
-            echo "Total: ".$count."<br>\n";
-            echo "Total Completed: ".$countCompleted."<br>\n";
-            echo "Total Successful: ".$countSuccessfully."<br><br>\n";
+            echo "<br>";
             $this->updateMembers();
-
+            echo "<br>";
             echo "Cached until: ".$corpJobs->cachedUntil."\n";
         }
         catch(Exception $e)
@@ -153,45 +174,92 @@ class pecoTracker
         }
     }
     
-    function inventionStatus()
+    function printInventions($startTime, $endTime)
     {
-        $query = "SELECT min(entryDate), max(entryDate)
-                  FROM pecoInvention";
-        $this->db->query($query);
-        $dates = mysql_fetch_assoc($this->db->result);
+        echo "<u>Invention Report for Week ".date("W", $startTime)."</u><br>";
+        echo "(".date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime).")</u><br><br>";
         
-        echo "<u>Invention Report</u><br>(".$dates["min(entryDate)"]." - ".$dates["max(entryDate)"].")</u><br><br>";
-        
-        $query = "SELECT memberName, inventorID, count(*), sum(completedStatus)
-                  FROM pecoInvention, pecoMemberID
-                  WHERE inventorID = memberID
-                  GROUP BY inventorID
+        $query = "SELECT memberName, installerID, count(*), sum(completedStatus)
+                  FROM pecoActivityTracking, pecoMemberID
+                  WHERE installerID = memberID
+                  AND entryDate >= '".date("o-m-d H:i:s", $startTime)."'
+                  AND entryDate < '".date("o-m-d H:i:s", $endTime)."'
+                  AND activityID = ".$this->inventionID."
+                  GROUP BY installerID
                   ORDER BY memberName";
         $this->db->query($query);
         
         $totalInventions = 0;
-        $totalInventors = 0;
-        $overallSuccess = 0;
+        $overallCompleted = 0;
         
-        while($line = mysql_fetch_assoc($this->db->result))
+        if (mysql_num_rows($this->db->result) > 0)
         {
-            echo "<b>".$line["memberName"]."</b>: ";
-            echo $line["count(*)"]." Inventions ";
-            echo "(".round($line["sum(completedStatus)"] / $line["count(*)"] * 100, 2)."% success)<br>\n";
+            while($line = mysql_fetch_assoc($this->db->result))
+            {
+                echo "<b>".$line["memberName"]."</b>: ";
+                echo $line["count(*)"]." Inventions ";
+                echo "(".round($line["sum(completedStatus)"] / $line["count(*)"] * 100, 2)."% success)<br>\n";
+                
+                $totalInventions += $line["count(*)"];
+                $overallCompleted += $line["sum(completedStatus)"];
+            }
             
-            $totalInventions += $line["count(*)"];
-            $totalInventors++;
-            $overallSuccess += $line["sum(completedStatus)"] / $line["count(*)"];
+            echo "<br><b>Total</b>: ";
+            echo $totalInventions." Inventions ";
+            echo "(".round($overallCompleted / $totalInventions * 100, 2)."% success)<br>";
         }
+        else
+        {
+            echo "<b>No inventions happened.</b><br>";
+        }
+    }
+    
+    function inventionStatus()
+    {
+        global $config;
         
-        echo "<br><b>Total</b>: ";
-        echo $totalInventions." Inventions ";
-        echo "(".round($overallSuccess / $totalInventors * 100, 2)."% success)<br>";
+        //Select timeframe for this week and last week
+        
+        $now = time();
+        $weekday = date("N", $now);
+        $hour = date("H", $now);
+        $minute = date("i", $now);
+        $seconds = date("s", $now);
+        
+        $currentWeekStart = $now - $seconds - ($minute * 60) - ($hour * 60 * 60) - (($weekday - 1) * 60 * 60 * 24);
+        $currentWeekEnd = $currentWeekStart + (7 * 24 * 60 * 60) - 1;
+        $lastWeekStart = $currentWeekStart - (7 * 24 * 60 * 60);
+        $lastWeekEnd = $currentWeekEnd - (7 * 24 * 60 * 60);
+        
+        $this->printInventions($currentWeekStart, $currentWeekEnd);
+        echo "<br><br>";
+        $this->printInventions($lastWeekStart, $lastWeekEnd);
     }
     
     function setupTables()
     {
+        global $config;
         
+        $query = "CREATE TABLE IF NOT EXISTS ".$config["db"]["tablePrefix"]."Activitytracking (
+                    jobID int(11) NOT NULL,
+                    activityID int(2) NOT NULL,
+                    installerID int(11) NOT NULL,
+                    beginProductionTime datetime DEFAULT NULL,
+                    endProductionTime datetime DEFAULT NULL,
+                    entryDate datetime DEFAULT NULL,
+                    outputTypeID int(11) NOT NULL,
+                    completedStatus tinyint(1) DEFAULT NULL,
+                    PRIMARY KEY (jobID)
+                  )";
+        $this->db->query($query);
+        
+        $query = "CREATE TABLE IF NOT EXISTS ".$config["db"]["tablePrefix"]."MemberID(
+                    memberID int(11) NOT NULL,
+                    memberName char(50) NOT NULL,
+                    PRIMARY KEY (memberID)
+                  )";
+        $this->db->query($query);
+        echo "Setup Complete";
     }
 }
 ?>

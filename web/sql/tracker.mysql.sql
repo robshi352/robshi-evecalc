@@ -1,7 +1,7 @@
 CREATE TABLE pecoInvention(
 	inventionID int(11) NOT NULL,
 	inventorID int(11) NOT NULL,
-	finishedDate datetime default NULL,
+	entryDate datetime default NULL,
 	outputTypeID int(11) NOT NULL,
 	completedStatus tinyint(1),
 	PRIMARY KEY (inventionID)
