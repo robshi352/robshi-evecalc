@@ -6,6 +6,26 @@ www.twoplusfour.co.uk
 /* =divs
 ----------------------------------------------- */
 
+#menu
+{
+    float: right;
+    /*width: 300px;*/
+    border: 1px solid black;
+    padding: 5px;
+/*    padding-bottom: 25px;    
+    padding-right: 25px;  */  
+}
+
+#info
+{
+    float: right;
+    /*width: 300px;*/
+    border: 1px solid black;
+    padding: 5px;
+/*    padding-bottom: 25px;    
+    padding-right: 25px;  */ 
+}
+
 #invCurr
 {
     float: left;
@@ -20,6 +40,7 @@ www.twoplusfour.co.uk
     float: left;
     /*width: 400px;*/
     /*border: 1px solid black;*/
+    padding-right: 25px;
     padding-bottom: 25px;    
 }
 
@@ -28,7 +49,8 @@ www.twoplusfour.co.uk
     float: left;
     /*width: 400px;*/
     /*border: 1px solid black;*/
-    padding-right: 25px;    
+   padding-bottom: 25px;    
+    padding-right: 25px;
 }
 
 #prodLast
@@ -36,6 +58,8 @@ www.twoplusfour.co.uk
     float: left;
     /*width: 400px;*/
     /*border: 1px solid black;*/
+    padding-bottom: 25px;    
+    padding-right: 25px;
 }
 
 table {border-collapse: collapse;

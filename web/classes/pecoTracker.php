@@ -176,7 +176,7 @@ class pecoTracker
         }
     }
     
-    function printInventions($startTime, $endTime, $divID, $outputMode="text")
+    function printInventions($startTime, $endTime, $divID, $outputMode="table")
     {
         $query = "SELECT memberName as Name, count(*) as Inventions, sum(completedStatus) as Successful
                   FROM pecoActivityTracking, pecoMemberID
@@ -187,7 +187,7 @@ class pecoTracker
                   GROUP BY installerID
                   ORDER BY memberName";
         $this->db->query($query);
-        
+        //echo "<b><i>".$query."</i></b>";
         $totalInventions = 0;
         $overallCompleted = 0;
         
@@ -195,7 +195,8 @@ class pecoTracker
             echo "<div id=".$divID.">\n";
         
         echo "<b><u>Invention Report for Week ".date("W", $startTime)."</u></b><br>\n";
-        echo "(".date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime).")</u><br><br>\n";
+        //echo date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime)."<br><br>\n";
+        echo date("F jS Y", $startTime)." - ".date("F jS Y", $endTime)."<br><br>\n";
         
         if ($outputMode == "table")
         {
@@ -241,7 +242,7 @@ class pecoTracker
             {
                 echo "<br><b>Total</b>: ";
                 echo $totalInventions." Inventions ";
-                echo "(".round($overallCompleted / $totalInventions * 100, 2)."% success)<br>";
+                echo "(".round($overallCompleted / $totalInventions * 100, 2)."% success)<br><br>";
             }
         }
         else
@@ -255,13 +256,14 @@ class pecoTracker
         }
     }
     
-    function printProductions($startTime, $endTime, $divID, $outputMode="text")
+    function printProductions($startTime, $endTime, $divID, $outputMode="table")
     {
         $buildingSlots = 10;
         
-        //select jobs interfering the the selected timeframe
-        $query = "SELECT memberName, endProductionTime, beginProductionTime
-                  FROM pecoActivityTracking AS t1, pecoMemberID AS t2, invMetaTypes AS t3
+        //select T2jobs interfering the the selected timeframe
+        $query = "SELECT memberName, endProductionTime, beginProductionTime, metaGroupID
+                  FROM (pecoActivityTracking AS t1, pecoMemberID AS t2)
+                       LEFT JOIN invMetaTypes AS t3 ON t3.typeID = t1.outputTypeID
                   WHERE t1.installerID = t2.memberID
                   AND
                   (
@@ -277,41 +279,52 @@ class pecoTracker
                         endProductionTime > '".date("o-m-d H:i:s", $endTime)."'
                     )
                   )
-                  AND t1.outputTypeID = t3.typeID
-                  AND metaGroupID = 2
                   AND activityID = ".$this->productionID."
                   ORDER BY memberName";
+        //echo "<b><i>".$query."</i></b>";
         $this->db->query($query);
         if ($outputMode == "table")
             echo "<div id=".$divID.">\n";
             
         echo "<b><u>Production Report for Week ".date("W", $startTime)."</u></b><br>";
-        echo "(".date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime).")</u><br><br>";
+        //echo "(".date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime).")</u><br><br>";
+        echo date("F jS Y", $startTime)." - ".date("F jS Y", $endTime)."<br><br>\n";
 
         if ($outputMode == "table")
         {
             echo "<table>\n";
             echo "<tr>";
-            echo "<th>Name</th><th>Productions</th><th>Utilization</th>";
+            echo "<th>Name</th>
+                  <th>Other Prod.</th>
+                  <th>Other Util.</th>
+                  <th>T2 Prod</th>
+                  <th>T2 Util.</th>
+                  <th>Total Util</th>";
             echo "</tr>\n";
         }
         $totalProductions = 0;
         
         if (mysql_num_rows($this->db->result) > 0)
         {
+            //T2 Stuff
             while($line = mysql_fetch_assoc($this->db->result))
             {
                 $startProductionTime = strtotime($line["beginProductionTime"]);
                 $endProductionTime = strtotime($line["endProductionTime"]);
                 $name = $line["memberName"];
+                if (!$line["metaGroupID"])
+                    $meta = 1;
+                else
+                    $meta = 2;
                 
-                $output[$name]["count"] += 1;
+                $output[$name][$meta."count"] += 1;
                 if ($startProductionTime < $startTime)
                     $startProductionTime = $startTime;
                 if ($endProductionTime > $endTime)
                     $endProductionTime = $endTime;
                 
-                $output[$name]["duration"] += $endProductionTime - $startProductionTime;
+                $output[$name][$meta."duration"] += $endProductionTime - $startProductionTime;
+                $output[$name]["totalduration"] += $endProductionTime - $startProductionTime;
             }
             
             foreach($output as $key => $value)
@@ -319,19 +332,44 @@ class pecoTracker
                 if ($outputMode == "table")
                 {
                     echo "<tr>
-                            <td>".$key."</td>
-                            <td>".$value["count"]."</td>
-                            <td>".round($value["duration"] / ($buildingSlots * ($endTime - $startTime)) * 100, 2)."%</td>
-                          </tr>";
+                            <td>".$key."</td>";
+                    for($meta=1; $meta <= 2; $meta++)
+                    {
+                            $util = round($value[$meta."duration"] / ($buildingSlots * ($endTime - $startTime)) * 100, 2);
+                            echo "<td>".$value[$meta."count"]."</td>";
+                            if ($util != 0)
+                                echo "<td>".$util."%</td>";
+                            else
+                                echo "<td>&nbsp;</td>";
+                    }
+                    echo "<td><b>".round($value["totalduration"] / ($buildingSlots * ($endTime - $startTime)) * 100, 2)."%</b></td>";
+                    echo "</tr>";
                 }
+
                 elseif($outputMode == "text")
                 {
                     echo "<u>".$key."</u>: ";
-                    echo $value["count"]." Productions ";
-                    echo "(".round($value["duration"] / ($buildingSlots * ($endTime - $startTime)) * 100, 2)."%, ";
-                    echo "utilization)<br>";
+
+                    for($meta=1; $meta <= 2; $meta++)
+                    {
+                        if ($value[$meta."count"])
+                        {
+                            if ($meta == 1)
+                                echo "<b>Other:</b> ";
+                            elseif ($meta == 2)
+                                echo "<b>T2:</b> ";
+    
+                            echo $value[$meta."count"]." Productions ";
+                            echo "(".round($value[$meta."duration"] / ($buildingSlots * ($endTime - $startTime)) * 100, 2)."%, ";
+                            echo "utilization)";
+                                echo " | ";
+                        }
+                    }
+                    echo "<b>Total: ".round($value["totalduration"] / ($buildingSlots * ($endTime - $startTime)) * 100, 2)."%</b> Utilization";
+                    echo "<br>";
                 }
             }
+            echo "<br>";
         }
         else
         {
@@ -345,7 +383,7 @@ class pecoTracker
         }        
     }
     
-    function inventionStatus()
+    function inventionStatus($style = "table")
     {
         //Select timeframe for this week and last week
         
@@ -360,14 +398,22 @@ class pecoTracker
         $lastWeekStart = $currentWeekStart - (7 * 24 * 60 * 60);
         $lastWeekEnd = $currentWeekEnd - (7 * 24 * 60 * 60);
         
-        echo "<div id=invention>";
-        $this->printInventions($currentWeekStart, $currentWeekEnd, "invCurr", "table");
-        $this->printInventions($lastWeekStart, $lastWeekEnd, "invLast", "table");
-        echo "</div>";
-        echo "<div style='clear: both;'></div>";
+        if ($style == "table")
+        {
+            echo "<div id=invention>";
+            $this->printInventions($currentWeekStart, $currentWeekEnd, "invCurr", "table");
+            $this->printInventions($lastWeekStart, $lastWeekEnd, "invLast", "table");
+            echo "</div>";
+            echo "<div style='clear: both;'></div>";
+        }
+        elseif ($style == "text")
+        {
+            $this->printInventions($currentWeekStart, $currentWeekEnd, "invCurr", "text");
+            $this->printInventions($lastWeekStart, $lastWeekEnd, "invLast", "text");
+        }
     }
     
-    function ProductionStatus()
+    function ProductionStatus($style)
     {
         $now = time();
         $weekday = date("N", $now);
@@ -380,11 +426,19 @@ class pecoTracker
         $lastWeekStart = $currentWeekStart - (7 * 24 * 60 * 60);
         $lastWeekEnd = $currentWeekEnd - (7 * 24 * 60 * 60);
         
-        echo "<div id=production>";
-        $this->printProductions($currentWeekStart, $currentWeekEnd, "prodCurr", "table");
-        $this->printProductions($lastWeekStart, $lastWeekEnd, "prodCurr", "table");
-        echo "</div>";
-        echo "<div style='clear: both;'></div>";
+        if ($style == "table")
+        {
+            echo "<div id=production>";
+            $this->printProductions($currentWeekStart, $currentWeekEnd, "prodCurr", "table");
+            $this->printProductions($lastWeekStart, $lastWeekEnd, "prodCurr", "table");
+            echo "</div>";
+            echo "<div style='clear: both;'></div>";
+        }
+        elseif ($style == "text")
+        {
+            $this->printProductions($currentWeekStart, $currentWeekEnd, "prodCurr", "text");
+            $this->printProductions($lastWeekStart, $lastWeekEnd, "prodCurr", "text");
+        }
     }
     
     function setupTables()
