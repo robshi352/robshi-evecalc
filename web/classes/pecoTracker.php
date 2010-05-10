@@ -160,7 +160,9 @@ class pecoTracker
                     {
                         echo " in progress ...";
                     }
+                    echo " || ".$job->installedItemLocationID;
                     echo "<br> \n";
+                    
                 }
             }
             echo "<br>";
@@ -174,12 +176,9 @@ class pecoTracker
         }
     }
     
-    function printInventions($startTime, $endTime)
+    function printInventions($startTime, $endTime, $divID, $outputMode="text")
     {
-        echo "<b><u>Invention Report for Week ".date("W", $startTime)."</u></b><br>";
-        echo "(".date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime).")</u><br><br>";
-        
-        $query = "SELECT memberName, installerID, count(*), sum(completedStatus)
+        $query = "SELECT memberName as Name, count(*) as Inventions, sum(completedStatus) as Successful
                   FROM pecoActivityTracking, pecoMemberID
                   WHERE installerID = memberID
                   AND entryDate >= '".date("o-m-d H:i:s", $startTime)."'
@@ -192,36 +191,76 @@ class pecoTracker
         $totalInventions = 0;
         $overallCompleted = 0;
         
+        if ($outputMode == "table")
+            echo "<div id=".$divID.">\n";
+        
+        echo "<b><u>Invention Report for Week ".date("W", $startTime)."</u></b><br>\n";
+        echo "(".date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime).")</u><br><br>\n";
+        
+        if ($outputMode == "table")
+        {
+            echo "<table>\n";
+            echo "<tr>";
+            foreach(array_keys(mysql_fetch_assoc($this->db->result)) as $key)
+                echo "<th>".$key."</th>";
+            echo "</tr>\n";
+            mysql_data_seek($this->db->result, 0);
+        }
+        
         if (mysql_num_rows($this->db->result) > 0)
         {
             while($line = mysql_fetch_assoc($this->db->result))
             {
-                echo "<u>".$line["memberName"]."</u>: ";
-                echo $line["count(*)"]." Inventions ";
-                echo "(".round($line["sum(completedStatus)"] / $line["count(*)"] * 100, 2)."% success)<br>\n";
-                
-                $totalInventions += $line["count(*)"];
-                $overallCompleted += $line["sum(completedStatus)"];
+                if ($outputMode == "table")
+                {
+                    echo "<tr>
+                            <td>".$line["Name"]."</td>
+                            <td>".$line["Inventions"]."</td>
+                            <td>".round($line["Successful"] / $line["Inventions"] * 100, 2)."%</td>
+                          </tr>\n";
+                }
+                elseif($outputMode == "text")
+                {
+                    echo "<u>".$line["Name"]."</u>: ";
+                    echo $line["Inventions"]." Inventions ";
+                    echo "(".round($line["Successful"] / $line["Inventions"] * 100, 2)."% success)<br>\n";
+                }
+                $totalInventions += $line["Inventions"];
+                $overallCompleted += $line["Successful"];
             }
             
-            echo "<br><b>Total</b>: ";
-            echo $totalInventions." Inventions ";
-            echo "(".round($overallCompleted / $totalInventions * 100, 2)."% success)<br>";
+            if ($outputMode == "table")
+            {
+                echo "<tr>
+                        <td><b>Total</b></td>
+                        <td><b>".$totalInventions."</b></td>
+                        <td><b>".round($overallCompleted / $totalInventions * 100, 2)."%</b></td>
+                      </tr>";
+            }
+            elseif($outputMode == "text")
+            {
+                echo "<br><b>Total</b>: ";
+                echo $totalInventions." Inventions ";
+                echo "(".round($overallCompleted / $totalInventions * 100, 2)."% success)<br>";
+            }
         }
         else
         {
             echo "<b>No inventions happened.</b><br>";
         }
+        if ($outputMode == "table")
+        {
+            echo "</table>";
+            echo "</div>";
+        }
     }
     
-    function printProductions($startTime, $endTime)
+    function printProductions($startTime, $endTime, $divID, $outputMode="text")
     {
         $buildingSlots = 10;
-        echo "<b><u>Production Report for Week ".date("W", $startTime)."</u></b><br>";
-        echo "(".date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime).")</u><br><br>";
         
         //select jobs interfering the the selected timeframe
-        $query = "SELECT memberName, installerID, endProductionTime, beginProductionTime, metaGroupID
+        $query = "SELECT memberName, endProductionTime, beginProductionTime
                   FROM pecoActivityTracking AS t1, pecoMemberID AS t2, invMetaTypes AS t3
                   WHERE t1.installerID = t2.memberID
                   AND
@@ -243,9 +282,19 @@ class pecoTracker
                   AND activityID = ".$this->productionID."
                   ORDER BY memberName";
         $this->db->query($query);
-        
-        //echo "<b><i><br>".$query."</i></b><br>";
-        
+        if ($outputMode == "table")
+            echo "<div id=".$divID.">\n";
+            
+        echo "<b><u>Production Report for Week ".date("W", $startTime)."</u></b><br>";
+        echo "(".date("l jS \of F Y", $startTime)." - ".date("l jS \of F Y", $endTime).")</u><br><br>";
+
+        if ($outputMode == "table")
+        {
+            echo "<table>\n";
+            echo "<tr>";
+            echo "<th>Name</th><th>Productions</th><th>Utilization</th>";
+            echo "</tr>\n";
+        }
         $totalProductions = 0;
         
         if (mysql_num_rows($this->db->result) > 0)
@@ -267,19 +316,33 @@ class pecoTracker
             
             foreach($output as $key => $value)
             {
-                echo "<u>".$key."</u>: ";
-                echo $value["count"]." Productions ";
-                echo "(".round($value["duration"] / ($buildingSlots * ($endTime - $startTime)) * 100, 2)."%, ";
-                echo "utilization)<br>";
+                if ($outputMode == "table")
+                {
+                    echo "<tr>
+                            <td>".$key."</td>
+                            <td>".$value["count"]."</td>
+                            <td>".round($value["duration"] / ($buildingSlots * ($endTime - $startTime)) * 100, 2)."%</td>
+                          </tr>";
+                }
+                elseif($outputMode == "text")
+                {
+                    echo "<u>".$key."</u>: ";
+                    echo $value["count"]." Productions ";
+                    echo "(".round($value["duration"] / ($buildingSlots * ($endTime - $startTime)) * 100, 2)."%, ";
+                    echo "utilization)<br>";
+                }
             }
-            
-            //echo "<br><b>Total</b>: ";
-            //echo $totalProductions." Productions ";
         }
         else
         {
             echo "<b>No production happened.</b><br>";
         }
+        
+        if ($outputMode == "table")
+        {
+            echo "</table>";
+            echo "</div>";
+        }        
     }
     
     function inventionStatus()
@@ -297,9 +360,11 @@ class pecoTracker
         $lastWeekStart = $currentWeekStart - (7 * 24 * 60 * 60);
         $lastWeekEnd = $currentWeekEnd - (7 * 24 * 60 * 60);
         
-        $this->printInventions($currentWeekStart, $currentWeekEnd);
-        echo "<br><br>";
-        $this->printInventions($lastWeekStart, $lastWeekEnd);
+        echo "<div id=invention>";
+        $this->printInventions($currentWeekStart, $currentWeekEnd, "invCurr", "table");
+        $this->printInventions($lastWeekStart, $lastWeekEnd, "invLast", "table");
+        echo "</div>";
+        echo "<div style='clear: both;'></div>";
     }
     
     function ProductionStatus()
@@ -315,9 +380,11 @@ class pecoTracker
         $lastWeekStart = $currentWeekStart - (7 * 24 * 60 * 60);
         $lastWeekEnd = $currentWeekEnd - (7 * 24 * 60 * 60);
         
-        $this->printProductions($currentWeekStart, $currentWeekEnd);
-        echo "<br><br>";
-        $this->printProductions($lastWeekStart, $lastWeekEnd);
+        echo "<div id=production>";
+        $this->printProductions($currentWeekStart, $currentWeekEnd, "prodCurr", "table");
+        $this->printProductions($lastWeekStart, $lastWeekEnd, "prodCurr", "table");
+        echo "</div>";
+        echo "<div style='clear: both;'></div>";
     }
     
     function setupTables()

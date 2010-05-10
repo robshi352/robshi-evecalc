@@ -2,6 +2,15 @@
 
 $mode = $_GET["mode"];
 
+echo "<html>
+        <header>
+            <title>Invention &amp; Production Tracker</title>
+            <link rel='stylesheet' href='css/greyscale.css'>
+
+        </header>
+        
+        <body>";
+
 require_once("ale/factory.php");
 require_once("classes/dbLink.php");
 require_once("classes/pecoTracker.php");
@@ -19,8 +28,10 @@ if ($mode == "track")
 else
 {
     $tracker->inventionStatus();
-    echo "<br>";
     $tracker->productionStatus();
 }
+
+echo "  </body>
+      </html>";
 
 ?>
