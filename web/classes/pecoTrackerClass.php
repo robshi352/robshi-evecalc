@@ -3,34 +3,11 @@ class pecoTracker
 {
     function __construct($userID, $apiKey, $charName, $dbLink)
     {
-        global $config;
         
-        try
-        {   
-            $this->ale = AleFactory::getEVEOnline();
-            //set user credentials, third parameter $characterID is also possible;
-            $this->ale->setCredentials($userID, $apiKey);
-            //all errors are handled by exceptions
-            //let's fetch characters first.
-            $account = $this->ale->account->Characters();
-            //you can traverse rowset element with attribute name="characters" as array
-            foreach ($account->result->characters as $character)
-            {
-                //this is how you can get attributes of element
-                $characterID = (string) $character->characterID;
-                //set characterID for CharacterSheet
-                $this->ale->setCharacterID($characterID);
-                if($character->name == $charName)
-                {
-                    break;
-                }
-            }
-        }
-        catch (Exception $e)
-        {
-            echo $e->getMessage();
-        }
-
+        $this->userID = $userID;
+        $this->apiKey = $apiKey;
+        $this->charName = $charName;
+        
         $this->db = $dbLink;
         $this->db->query("SELECT activityID
                           FROM ramactivities
@@ -43,6 +20,37 @@ class pecoTracker
                           WHERE activityName = 'Manufacturing'");
         $productionID = mysql_fetch_assoc($this->db->result);
         $this->productionID = $productionID["activityID"];        
+    }
+    
+    function init()
+    {
+        global $config;
+        
+        try
+        {   
+            $this->ale = AleFactory::getEVEOnline();
+            //set user credentials, third parameter $characterID is also possible;
+            $this->ale->setCredentials($this->userID, $this->apiKey);
+            //all errors are handled by exceptions
+            //let's fetch characters first.
+            $account = $this->ale->account->Characters();
+            //you can traverse rowset element with attribute name="characters" as array
+            foreach ($account->result->characters as $character)
+            {
+                //this is how you can get attributes of element
+                $characterID = (string) $character->characterID;
+                //set characterID for CharacterSheet
+                $this->ale->setCharacterID($characterID);
+                if($character->name == $this->charName)
+                {
+                    break;
+                }
+            }
+        }
+        catch (Exception $e)
+        {
+            echo $e->getMessage();
+        }
     }
     
     function jobAlreadyTracked($jobID)

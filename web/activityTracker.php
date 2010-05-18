@@ -6,15 +6,14 @@ echo "<html>
         <header>
             <title>Invention &amp; Production Tracker</title>
             <link rel='stylesheet' href='css/greyscale.css'>
-
         </header>
         
         <body>";
 
 require_once("ale/factory.php");
-require_once("classes/dbLink.php");
-require_once("classes/pecoTracker.php");
-require_once("classes/trackerMenu.php");
+require_once("classes/dbLinkClass.php");
+require_once("classes/pecoTrackerClass.php");
+require_once("classes/trackerMenuClass.php");
 
 $config = parse_ini_file("tracker.ini", true);
 
@@ -28,6 +27,11 @@ $trackerMenu->getCurrent();
 $db = new dbLink($config["db"]["host"], $config["db"]["user"], $config["db"]["password"], $config["db"]["database"]);
 $tracker = new pecoTracker($config["user"]["userID"], $config["user"]["apiKey"], $config["user"]["charName"], $db);
 
+$query = "SELECT max(entryDate)
+          FROM pecoActivityTracking";
+$db->query($query);
+$line = mysql_fetch_assoc($db->result);
+$latestEntry = strtotime($line["max(entryDate)"]);
 
 if ($trackerMenu->currentStyle == "table")
 {
@@ -37,6 +41,11 @@ if ($trackerMenu->currentStyle == "table")
         echo " | <a href=".$PHP_SELF."?mode=".$trackerMenu->currentMode."&style=".$trackerMenu->currentStyle.">hide Info</a>";
     else
         echo " | <a href=".$PHP_SELF."?mode=".$trackerMenu->currentMode."&style=".$trackerMenu->currentStyle."&info=show>show Info</a>";
+    
+    echo "<br><br>";
+    echo "<u><b>Last Update</b></u><br>";
+    echo date("F jS, H:i", $latestEntry);
+    echo " (".(int)((time() - $latestEntry) / 3600)." Hours ago)";
     echo "</div>";
 }
 elseif ($trackerMenu->currentStyle == "text")
@@ -55,12 +64,16 @@ if ($info)
                 <li>Inventions will only be tracked if they're delivered at the time of an update</li>
                 <li>Utilization = (sum of time manufacturing / (Time in a week * 10))</li>
                 <li>Utilization is based on 10 manufacturing jobs</li>
+                <li><b>".$trackerMenu->currentMode."
             </ul>
           </div>";
 }
 
 if ($trackerMenu->currentMode == "track")
+{
+    $tracker->init();
     $tracker->track();
+}
 
 elseif($trackerMenu->currentMode == "inv")
     $tracker->inventionStatus($trackerMenu->currentStyle);

@@ -48,7 +48,7 @@ class trackerMenu
     
     function getCurrent()
     {
-        if (in_array($_GET["mode"], array_keys($this->modes)))
+        if (in_array($_GET["mode"], array_keys($this->modes)) || $_GET["mode"] == "track")
             $this->currentMode = $_GET["mode"];
         else
             $this->currentMode = $this->modes["default"];

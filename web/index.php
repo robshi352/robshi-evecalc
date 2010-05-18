@@ -1,40 +1,44 @@
 <?php
 
-require_once("classes/dbLink.php");
-require_once("classes/siteFunctions.php");
+require_once("classes/dbLinkClass.php");
+require_once("classes/siteFunctionsClass.php");
 
     
     $functions = array("about" => array("about", "about.php"),
                        "ice" => array("Ice Calculation", "ice.php"),
                        "pos" => array("POS Refill Calculation", "pos.php"),
                        "station" => array("Station Locator", "station.php"),
-                       "agent" => array("Agent Locator", "agent.php"));
+                       "agent" => array("Agent Locator", "agent.php"),
+                       "t2comps" => array("T2 Component Calculator", "comp.php"));
+
+    $config = parse_ini_file("eveTools.ini", true);
     
-    $db = new dbLink("localhost", "root", "", "eve_online");
+    $db = new dbLink($config["db"]["host"], $config["db"]["user"], $config["db"]["password"], $config["db"]["database"]);
     $siteFunctions = new siteFunctions($functions);
-    $currentFunction = $_GET["func"];
+    $siteFunctions->current();
 ?>
 
 <html>
     <head>
         <title>Misc. Eve Tools</title>
+        <link rel='stylesheet' href='css/toolset.css'>
     </head>
     <body>
+        
     <!-- MENU -->
         <?php
-            $siteFunctions->printFunctions();
-            echo "<br><br>";
-            if ($siteFunctions->getFile($currentFunction) != "")
+            echo "<div id=menu>";
+            $siteFunctions->display();
+            echo "</div>";
+
+            echo "<div id=content>";
+            if ($siteFunctions->getFunctionFile() != "")
             {
-                include($siteFunctions->getFile($currentFunction));                
+                include($siteFunctions->getFunctionFile($currentFunction));                
             }
+            echo "</div>";
+            echo "<div style='clear: both;'></div>";
         ?>
     
     </body>
 </html>
-
-
-<?php
-    //FREE MYSQL CONNECTION
-    unset($db);
-?>
