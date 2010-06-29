@@ -1,0 +1,13 @@
+2010-06-30 09:45:37
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2010-05-31 09:45:37</currentTime>
+  <result>
+    <rowset name="characters" key="characterID" columns="name,characterID">
+      <row name="Tolimpex" characterID="1550828885" />
+      <row name="Kjeldorian Guard" characterID="163728041" />
+      <row name="Ignaciaa" characterID="1544506925" />
+    </rowset>
+  </result>
+  <cachedUntil>2010-06-30 09:45:37</cachedUntil>
+</eveapi>

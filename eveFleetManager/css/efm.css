@@ -1,0 +1,409 @@
+/* General
+----------------------------------------------- */
+
+body
+{
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    font: small/1.5em georgia, times, serif;
+    color: #333331;
+    text-align: left;
+}
+	
+a
+{
+    color: #c50;
+    text-decoration: none;
+    border-bottom: 1px solid #dca;
+}
+	
+a:visited
+{
+    color: #a86;
+    border: none;
+}
+	
+a:hover
+{
+    color: #000;
+    border-bottom: 1px solid #333331;
+}
+	
+acronym
+{
+    cursor: help;
+    font-style: normal;
+    border: none;
+}
+	
+h1
+{
+    display: none;
+}
+    
+h2
+{
+    font-size: 1.5em;
+    font-weight: normal;
+    color: #922;
+    margin: 0 0 0.6em 0;
+    padding: 0;
+}
+	
+h3
+{
+    width: 420px;
+    height: 20px;
+    margin: 1.2em 0 0.8em 0;
+}
+	
+h3 span
+{
+    display: none;
+    visibility: hidden;
+}
+	
+p
+{
+    text-indent: 2em;
+    font-size: 88%;
+    margin: 0 0 0.6em 0;
+}
+
+
+/* The following hack is to correct paragraph text size in IE/WIN */
+
+/* \*/ * html body p { font-size: 80%; } /* */
+
+
+/* Divs
+----------------------------------------------- */
+
+#menu
+{
+    float: left;
+    /*border: 1px solid black;*/
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: left;
+    width: 47em;
+    overflow: hidden;
+}
+
+#shipImage
+{
+    float: left;
+    /*margin-right: 10px;*/
+    /*border: 1px solid black;*/
+
+}
+
+#textMenu
+{
+    position: absolute;
+    bottom: 0px;
+    white-space: nowrap;
+    /*display: inline;*/
+    /*border: 1px solid black;*/
+    overflow: hidden;
+}
+
+#logo
+{
+    /*overflow: hidden;*/
+}
+
+#logoMenuContainer
+{
+    /*border: 1px solid black;*/
+    overflow: hidden;
+    height: 64px;
+    position: relative;
+    padding-left: 5px;
+    overflow: hidden;
+}
+
+#content
+{
+    float: left;
+    padding: 10px;
+}
+
+#fleetinfo
+{
+    float: right;
+    border: 1px solid black;
+    /*top: 0px;*/
+    /*right: 0px;*/
+    white-space: nowrap;
+    overflow: hidden;
+    margin-right: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-top: 0px;
+    border-top: 0;
+    background: #f6f6f6;
+}
+
+#scoutPosition
+{
+    float: right;
+    border: 1px solid black;
+    /*top: 0px;*/
+    /*right: 0px;*/
+    white-space: nowrap;
+    overflow: hidden;
+    margin-right: 10px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-top: 0px;
+    border-top: 0;
+    background: #f6f6f6;
+}
+
+#createFleet
+{
+    float: left;
+    border: 1px solid black;
+    padding: 10px;
+}
+
+#menuContainer
+{
+    /*border: 1px solid red;*/
+}
+
+#contentContainer
+{
+    /*border: 1px solid green;*/
+    padding-left: 10px;
+}
+
+#footerContainer
+{
+    /*border: 1px solid blue;*/
+}
+
+
+/* Forms
+----------------------------------------------- */
+
+fieldset
+{   
+    margin: 0 0 0 0;   
+    padding: 0;
+    border: solid 1px;
+    border-color: #333331;
+}  
+
+legend
+{   
+    margin-left: 1em;   
+    color: #000000;   
+    font-weight: normal;  
+}
+
+fieldset ol
+{   
+    padding: 0 1em 0 1em;   
+    list-style: none;  
+}  
+
+fieldset li
+{
+    padding-left: 0;
+    padding-bottom: 1em;  
+}
+
+fieldset.submit
+{   
+    border-style: none;  
+}
+
+label
+{    
+    display: block;
+    padding-left: 0.2em;
+}
+
+input[type="text"]
+{
+	border:1px solid #333331;
+	background:#f6f6f6;
+	/*-moz-border-radius:0.4em;*/
+	/*-khtml-border-radius:0.4em;*/
+}
+
+input[type="text"]:active, input[type="text"]:hover
+{
+	border:1px solid #922;
+	background:#f6f6f6;
+}
+
+p.hint
+{
+    background:#f5f5f5;
+    border:1px solid #e6e6e6;
+    color:#444;
+    font-size:80%;
+    left:100%;
+    line-height:130%;
+    margin:0 0 0 8px;
+    padding:8px 10px 9px;
+    position:absolute;
+    top:0;
+    visibility:hidden;
+    width:42%;
+    z-index:1000;
+}
+
+li:hover .hint, li:active .hint
+{
+    visibility:visible;
+}
+/* -=- fonts -=-
+----------------------------------------------- */
+
+font.formError
+{
+    color: red;
+}
+
+font.formHint
+{
+    color: orange;
+}
+
+strong
+{
+    font-size: 1.0em;
+    font-weight: normal;
+    color: #922;
+    margin: 0 0 0 0;
+    padding: 0;
+    font-style: normal;
+}
+
+em
+{
+    font-size: 1.0em;
+    font-weight: normal;
+    color: #922;
+    margin: 0 0 0 0;
+    padding: 0;
+    font-style: normal;
+}
+
+/* -=- tables -=-
+----------------------------------------------- */
+
+table
+{
+    border-collapse: collapse;
+    border: 1px solid #000;
+    /*font: normal 80%/140% arial, helvetica, sans-serif;*/
+    font-size: 90%;
+    color: #555;
+    background: #fff;
+}
+
+td, th
+{
+    border: 1px dotted #bbb;
+    padding: .5em;
+    /*line-height: 1em;*/
+}
+
+td.mark, th.mark
+{
+    border-right: 1px solid #bbb;
+}
+
+tr.mark
+{
+    border-top: 1px solid #bbb;
+}
+
+td.vmark, th.vmark
+{
+    border-left: 1px solid #bbb;
+}
+
+tr.vmark
+{
+    border-bottom: 1px solid #bbb;
+}
+
+caption
+{
+    padding: 0 0 .5em 0;
+    text-align: left;
+    font-size: 1.4em;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #333;
+    background: transparent;
+}
+
+/* =links */
+
+table a
+{
+    color: #c50;
+    text-decoration: none;
+    border-bottom: 1px solid #dca;
+    background: transparent;
+}
+
+table a:visited
+{
+    color: #a86;
+    border: none;
+}
+
+table a:hover
+{
+    color: #000;
+    border-bottom: 1px solid #333331;
+}
+
+/* =head =foot */
+
+thead th, tfoot th
+{
+    border: 2px solid #000;
+    text-align: left;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    background: transparent;
+}
+
+tfoot td
+{
+    border: 2px solid #000;
+}
+
+/* =body */
+
+tbody th, tbody td
+{
+    vertical-align: middle;
+    text-align: center;
+}
+
+tbody th
+{
+    white-space: nowrap;
+}
+
+.odd
+{
+    background: #fcfcfc;
+}
+
+tbody tr:hover
+{
+    background: #fafafa;
+}

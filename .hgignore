@@ -1,0 +1,3 @@
+glob:website/bigdump.php
+relre:website/cachedir/*
+relre:activityTracker/cachedir/*

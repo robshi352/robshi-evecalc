@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="abb235e2-a8c6-4b3e-a6d7-c80ae362daa2" kpf_version="4" name="eve_tools_web.kpf">
+<preference-set idref="abb235e2-a8c6-4b3e-a6d7-c80ae362daa2">
+  <boolean id="import_live">1</boolean>
+</preference-set>
+</project>

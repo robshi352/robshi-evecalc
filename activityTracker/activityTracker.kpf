@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="6273ae11-40b6-49c8-a4de-d05090fcce3a" kpf_version="4" name="activityTracker.kpf">
+<preference-set idref="6273ae11-40b6-49c8-a4de-d05090fcce3a">
+  <boolean id="import_live">1</boolean>
+</preference-set>
+</project>
