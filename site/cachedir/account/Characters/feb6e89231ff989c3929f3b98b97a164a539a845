@@ -1,0 +1,13 @@
+2010-05-16 04:36:01
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2010-05-16 03:36:01</currentTime>
+  <result>
+    <rowset name="characters" key="characterID" columns="name,characterID,corporationName,corporationID">
+      <row name="Nicole Maher" characterID="127161070" corporationName="Precision Collision" corporationID="2027476067" />
+      <row name="Vaygrr" characterID="1212788880" corporationName="Camelids Unicorns N Tears" corporationID="188209157" />
+      <row name="Nora Roksi" characterID="1492634654" corporationName="Precision Collision" corporationID="2027476067" />
+    </rowset>
+  </result>
+  <cachedUntil>2010-05-16 04:36:01</cachedUntil>
+</eveapi>

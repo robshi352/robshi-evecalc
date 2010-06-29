@@ -1,0 +1,50 @@
+2010-05-16 09:56:52
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2010-05-16 03:56:52</currentTime>
+  <result>
+    <corporationID>2027476067</corporationID>
+    <corporationName>Precision Collision</corporationName>
+    <ticker>PECO</ticker>
+    <ceoID>202821753</ceoID>
+    <ceoName>Marbo Slyder</ceoName>
+    <stationID>60004159</stationID>
+    <stationName>Tintoh VII - Moon 10 - Spacelane Patrol Logistic Support</stationName>
+    <description>Remember the dead, fight for the living.</description>
+    <url />
+    <allianceID>1835092947</allianceID>
+    <allianceName>ISK Six</allianceName>
+    <taxRate>0</taxRate>
+    <memberCount>67</memberCount>
+    <memberLimit>2300</memberLimit>
+    <shares>1000</shares>
+    <rowset name="divisions" key="accountKey" columns="accountKey,description">
+      <row accountKey="1000" description="WAREHOUSE" />
+      <row accountKey="1001" description="MANUFACTURING - MODULES" />
+      <row accountKey="1002" description="MANUFACTURING - SHIPS" />
+      <row accountKey="1003" description="MANUFACTURING - OTHER" />
+      <row accountKey="1004" description="FINISHED GOODS" />
+      <row accountKey="1005" description="INVENTION" />
+      <row accountKey="1006" description="RESEARCH" />
+    </rowset>
+    <rowset name="walletDivisions" key="accountKey" columns="accountKey,description">
+      <row accountKey="1000" description="Master Wallet" />
+      <row accountKey="1001" description="Research Wallet" />
+      <row accountKey="1002" description="Trading Wallet" />
+      <row accountKey="1003" description="Manufacturing Wallet" />
+      <row accountKey="1004" description="Internal Investment Fund" />
+      <row accountKey="1005" description="External Investment Fund" />
+      <row accountKey="1006" description="Supply Wallet" />
+    </rowset>
+    <logo>
+      <graphicID>0</graphicID>
+      <shape1>566</shape1>
+      <shape2>570</shape2>
+      <shape3>513</shape3>
+      <color1>672</color1>
+      <color2>682</color2>
+      <color3>0</color3>
+    </logo>
+  </result>
+  <cachedUntil>2010-05-16 09:56:52</cachedUntil>
+</eveapi>

@@ -1,0 +1,13 @@
+2010-05-31 10:45:35
+<?xml version='1.0' encoding='UTF-8'?>
+<eveapi version="2">
+  <currentTime>2010-05-31 09:45:35</currentTime>
+  <result>
+    <rowset name="characters" key="characterID" columns="name,characterID,corporationName,corporationID">
+      <row name="Ver Kar" characterID="1028254255" corporationName="School of Applied Knowledge" corporationID="1000044" />
+      <row name="Yin Karath" characterID="1098831645" corporationName="State War Academy" corporationID="1000167" />
+      <row name="Gar Karath" characterID="1355761707" corporationName="Precision Collision" corporationID="2027476067" />
+    </rowset>
+  </result>
+  <cachedUntil>2010-05-31 10:45:35</cachedUntil>
+</eveapi>
