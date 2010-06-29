@@ -7,34 +7,31 @@
         function __construct($functions)
         {
             $this->functions = $functions;
+            $this->currentFunction = $_GET["func"];
         }
         
         function display()
         {
             $i = 1;
-            foreach($this->functions as $funcName => $funcValue)
+            foreach($this->functions as $funcShort => $funcExtended)
             {
-                if ($funcName == $this->currentFunction)
-                    echo "<b>".$funcValue[0]."</b>";
-                else
-                    echo "<a href=".$_SERVER['PHP_SELF']."?func=".$funcName.">".$funcValue[0]."</a>";
-                if ($i < sizeof($this->functions))
+                if ($funcExtended["visible"])
                 {
-                    echo " | ";
+                    if ($funcShort == $this->currentFunction)
+                        echo "<b>".$funcExtended["description"]."</b>";
+                    else
+                        echo "<a href=".$PHP_SELF."?func=".$funcShort.">".$funcExtended["description"]."</a>";
+                    if ($i < sizeof($this->functions))
+                        echo " | ";
+                    echo "\n";
                 }
-                echo "\n";
                 $i++;
             }
         }
         
         function getFunctionFile()
         {
-            return $this->functions[$this->currentFunction][1];
-        }
-        
-        function current()
-        {
-            $this->currentFunction = $_GET["func"];
+            return $this->functions[$this->currentFunction]["file"];
         }
     }
 ?>

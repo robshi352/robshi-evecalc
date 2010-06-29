@@ -1,264 +1,178 @@
 <?php
-    $submit = $_POST["submit"];
-    $locationName = $_POST["location"];
-    $selectedCorpID = $_POST["corp"];
-    $medical = $_POST["medical"];
-    $jumpclone = $_POST["jumpclone"];
-    $hisec = $_POST["hisec"];
-    $losec = $_POST["losec"];
-    $zero = $_POST["zero"];
 
-    $medicalID = 512;
-    $jumpcloneID = 8388608;
-    class station
+class stationLocator
+{
+    function __construct($db, $currentFunction)
     {
-        function station($name, $security, $locationID, $distance)
-        {
-            $this->name = $name;
-            $this->security = $security;
-            $this->locationID = $locationID;
-            $this->distance = $distance;
-        }
+        $this->currentFunction = $currentFunction;
+        $this->db = $db;
+        $this->services = array("Medical", "Reprocessing");
         
-        function printStationDistance()
-        {
-            echo "<b>".$this->distance."</b> - ";
-            echo $this->name." (".round($this->security, 1).")<br>\n";
-        }
+        $query = "SELECT corporationID, itemName
+                  FROM crpNpcCorporations AS t1, eveNames AS t2
+                  WHERE t1.corporationID = t2.itemID
+                  ORDER BY itemName ASC";
+        $this->db->query($query);
         
-        function printStation()
+        while($line = mysql_fetch_assoc($this->db->result))
         {
-            echo $this->name." (".round($this->security, 1).")<br>\n";
+            $this->corpList[$line["corporationID"]] = $line["itemName"];
         }
-    }
-    class corporation
-    {        
-        function corporation($selectedID)
-        {
-            $this->selectedID = $selectedID;
-            $this->query = "SELECT corporationID, itemName
-                            FROM crpnpccorporations AS t1, evenames AS t2
-                            WHERE t1.corporationID = t2.itemID
-                            ORDER BY itemName";
-        }
-        
-        function printSelection()
-        {
-            global $db;
-
-            echo "Corporation: <select name=corp>";
-            $db->query($this->query);
-            while($line = mysql_fetch_array($db->result, MYSQL_ASSOC))
-            {
-                if ($this->selectedID == $line["corporationID"])
-                {
-                    echo "<option value=".$line["corporationID"]." selected>".$line["itemName"]."</option>\n";    
-                }
-                else
-                {
-                    echo "<option value=".$line["corporationID"].">".$line["itemName"]."</option>\n";
-                }
-            }
-            echo "</select><br>\n";
-        }
+        $this->formSubmitted = $this->evalForm();
     }
     
-    
-    class stationList
+    function evalForm()
     {
-        function stationList()
+        if ($_POST["getStations"])
         {
-            $this->stationList = array();
-        }
-        
-        function add($station)
-        {
-            $this->stationList[] = $station;
-        }
-        
-        function printStationDistance()
-        {
-            foreach ($this->stationList as $key => $value)
+            $this->submitted = true;
+            
+            $this->formValues["locationName"] = $_POST["locationName"];
+            $this->formValues["corpID"] = $_POST["corpID"];
+            
+            foreach($this->services as $serviceName)
             {
-                $value->printStationDistance();
-            }
-        }
-        
-        function printStation()
-        {
-            foreach ($this->stationList as $key => $value)
-            {
-                $value->printStation();
-            }
-        }
-    }
-    echo "<form action=".$PHP_SELF."?func=".$currentFunction." method=POST>\n";
-    if ($submit)
-    {
-        $query =   "SELECT stationName, t2.security
-                    FROM stastations AS t1, mapsolarsystems AS t2, staoperationservices AS t3
-                    WHERE t1.corporationID = ".$selectedCorpID."
-                    AND t1.solarSystemID = t2.solarSystemID
-                    AND t1.operationID = t3.operationID
-                    ";
-        if ($location)
-        {
-            $query2 =   "SELECT solarSystemID
-                        FROM mapsolarsystems
-                        WHERE solarSystemName = '".$locationID."'";
-            $db->query($query2);
-            while($line = mysql_fetch_array($db->result, MYSQL_ASSOC))
-            {
-                $locationID = $line["solarSystemID"];
+                $this->formValues[$serviceName] = $_POST[$serviceName];
             }
             
-            if ($locationID)
+            $query = "SELECT solarSystemID
+                      FROM mapSolarSystems
+                      WHERE solarSystemName = '".mysql_real_escape_string($_POST["locationName"])."'";
+            $this->db->query($query);
+            
+            if (mysql_num_rows($this->db->result) > 0)
             {
-            $query =   "SELECT stationName, t2.security, distance
-                        FROM stastations AS t1, mapsolarsystems AS t2, staoperationservices AS t3, mapdistance AS t4
-                        WHERE t1.corporationID = ".$selectedCorpID."
-                        AND t1.solarSystemID = t2.solarSystemID
-                        AND t1.operationID = t3.operationID
-                        AND t4.fromSolarSystemID = ".$locationID."
-                        AND t4.toSolarSystemID = t1.solarSystemID
-                        ";                
+                $locationID = mysql_fetch_assoc($this->db->result);
+                $locationID = $locationID["solarSystemID"];
+                
+                $query = "SELECT stationName, distance
+                          FROM staStations AS t1, mapDistance as t2
+                          WHERE t1.solarSystemID = t2.toSolarSystemID
+                          AND t2.fromSolarSystemID = ".$locationID."
+                          AND t1.corporationID = ".mysql_real_escape_string($_POST["corpID"])."
+                          ORDER BY distance ASC";
+                $this->db->query($query);
+                while($line = mysql_fetch_assoc($this->db->result))
+                    $this->stationList[$line["stationName"]] = $line["distance"];
             }
             else
             {
-                $locationError = 1;
+                $this->formErrors["locationName"] = true;
             }
-
-        }
-
-        if ($hisec and $losec)
-        {
-            $query = $query."AND t2.security > 0
-                            ";
-        }
-        else if ($hisec and $zero)
-        {
-            $query = $query."AND (t2.security > 0.5
-                             OR t2.security <= 0)
-                            ";
-        }
-        else if ($losec and $zero)
-        {
-            $query = $query."AND t2.security < 0.5
-                            ";
-        }
-        else if ($hisec)
-        {
-            $query = $query."AND t2.security >= 0.5
-                            ";
-        }
-        else if ($losec)
-        {
-            $query = $query."AND t2.security < 0.5
-                             AND t2.security > 0
-                             ";
-        }
-        else if ($zero)
-        {
-            $query = $query."AND t2.security <= 0
-                            ";
-        }
-        if ($medical){
-            $query = $query."AND t3.serviceID = ".$medicalID."
-                            ";
-        }
-        if ($jumpclone)
-        {
-            $query = $query."AND t3.serviceID = ".$jumpcloneID."
-                            ";
-        }
-        $query = $query."GROUP BY stationID
-                        ";
-        if ($locationID)
-        {
-            $query = $query. "ORDER BY distance ASC, stationName ASC";
         }
         else
-        {
-            $query = $query. "ORDER BY stationName ASC";
-        }
-        //$result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
+            $this->submitted = false;
     }
-
-    echo "Location: <input type=text value='".$location."' name=location>";
-    if ($locationError)
-    {
-        echo " <font color=red>check spelling</font>";
-    }
-    echo "<br>\n";
-
-    $corporations = new corporation($selectedCorpID);
-    $corporations->printSelection();
     
-    if ($medical)
+    function getServices()
     {
-        echo "<input type=checkbox name=medical checked>Medical";
+        return $this->services;
     }
-    else
+    
+    function getCorpList()
     {
-        echo "<input type=checkbox name=medical>Medical";        
+        return $this->corpList;
     }
+    
+    function getStationList()
+    {
+        return $this->stationList;
+    }
+    
+    function getEvalState()
+    {
+        return $this->evalState;
+    }
+    
+    function getFormValues()
+    {
+        return $this->formValues;
+    }
+    
+    function formSubmitted()
+    {
+        return $this->submitted;
+    }
+    
+    function getFormErrors()
+    {
+        return $this->formErrors;
+    }
+}
 
-    if ($jumpclone)
+class stationDisplay
+{
+    function __construct($currentFunction)
     {
-        echo "<input type=checkbox name=jumpclone checked>Jump Clone<br>";
+        $this->currentFunction = $currentFunction;
     }
-    else
+    
+    function displayForm($corpList, $formSubmitted, $formValues, $formErrors, $services)
     {
-        echo "<input type=checkbox name=jumpclone>Jump Clone<br>";        
-    }
+        echo "<div id=\"stationLocatorForm\" class=\"content\">";
+        echo sprintf("<form method=\"POST\" action=\"%s?func=%s\">", $PHP_SELF, $this->currentFunction);
 
-    if ($hisec or !$submit)
-    {
-        echo "<input type=checkbox name=hisec checked>Highsec";        
-    }
-    else
-    {
-        echo "<input type=checkbox name=hisec>Highsec";                
-    }
-    if ($losec or !$submit)
-    {
-        echo "<input type=checkbox name=losec checked>Lowsec";        
-    }
-    else
-    {
-        echo "<input type=checkbox name=losec>Lowsec";                
-    }
-    if ($zero or !$submit)
-    {
-        echo "<input type=checkbox name=zero checked>0.0<br>\n";        
-    }
-    else
-    {
-        echo "<input type=checkbox name=zero>0.0<br>\n";
-    }
-
-    echo "<input type=submit value=submit name=submit>";
-    echo "</form><br>";
-
-    if ($submit)
-    {
-        if ($locationID)
+        echo "Corporation: <select name=\"corpID\">";
+        foreach($corpList as $corpID => $corpName)
         {
-            echo "<u>Distance - Station (Security)";
+            if ($corpID == $formValues["corpID"])
+                echo sprintf("<option value=\"%d\" selected>%s</option>", $corpID, $corpName);
+            else
+                echo sprintf("<option value=\"%d\">%s</option>", $corpID, $corpName);
         }
-        else
+        echo "</select><br>";
+        
+        echo sprintf("Location: <input type=\"text\" name=\"locationName\" value=\"%s\">", $formValues["locationName"]);
+        if ($formErrors["locationName"])
+            echo "<strong> Could not find that System.</strong>";
+        echo "<br>";
+        
+        echo "Services: ";
+        $firstRun = true;
+        foreach($services as $serviceName)
         {
-            echo "<u>Station (Security)";
+            if (!$firstRun)
+                echo " | ";
+            if ($formValues[$serviceName] || !$formSubmitted)
+                echo sprintf("<input type=\"checkbox\" name=\"%s\" checked>%s", $serviceName, $serviceName);
+            else
+                echo sprintf("<input type=\"checkbox\" name=\"%s\">%s", $serviceName, $serviceName);
+            $firstRun = false;
         }
-        echo "</u><br>";
-        $db->query($query);
-        while($line = mysql_fetch_array($db->result, MYSQL_ASSOC))
-        {
-            if ($locationID)
-            {
-                echo "<b>".$line["distance"]."</b> - ";
-            }
-            echo $line["stationName"]." (".round($line["security"], 1).")<br>\n";
-        }
+        echo "<br>";
+        
+        echo "<input type=\"submit\" value=\"calculate\" name=\"getStations\">";
+        echo "</form>";
     }
+    
+    function displayResult($stationList)
+    {
+        echo "<div id=\"stationLocatorResult\" class=\"content\">";
+        
+        echo "<ol>";
+        
+        foreach($stationList as $stationName => $distance)
+        {
+            echo "<li>";
+            echo sprintf("%d - %s", $distance, $stationName);
+            echo "</li>";
+        }
+        echo "</ol>";
+        
+        echo "</div>";
+    }
+}
+
+$stationLocator = new stationLocator($db, $siteFunctions->currentFunction);
+$stationDisplay = new stationDisplay($siteFunctions->currentFunction);
+
+$stationDisplay->displayForm($stationLocator->getCorpList(),
+                             $stationLocator->formSubmitted(),
+                             $stationLocator->getFormValues(),
+                             $stationLocator->getFormErrors(),
+                             $stationLocator->getServices());
+
+if ($stationLocator->formSubmitted() && sizeof($stationLocator->getFormErrors()) == 0)
+    $stationDisplay->displayResult($stationLocator->getStationList());
+
 ?>
