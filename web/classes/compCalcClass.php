@@ -84,7 +84,7 @@ class compCalc
         global $siteFunctions;
         
         echo "<form method=POST action=".$PHP_SELF."?func=".$siteFunctions->currentFunction.">";
-        
+        echo "<div style=\"visibility:hidden;width:0px; height:0px;\"><input type=submit value=calculate name=submit></div>";
         for($i=0; $i<$this->formCount; $i++)
         {
             echo "<select name=buildItem".$i.">";
@@ -146,21 +146,28 @@ class compCalc
                     $this->buildName[$line["materialID"]] = $line["materialName"];
                 }
                 
-                //recycled stuff, basically have to subtract t1 build requirements
-                
-                $query = "SELECT t2.materialTypeID AS materialID,
-                                 t2.quantity AS quantity
-                          FROM invMetaTypes AS t1,
-                               invTypeMaterials AS t2
-                          WHERE t1.typeID = ".$this->buildItems[$i]."
-                          AND t1.parentTypeID = t2.typeID";
+                //recycled stuff, basically have to subtract t1 build requirements for some t2 mods
+                $query = "SELECT materialTypeID AS materialID,
+                                 t3.quantity * damagePerJob AS quantity
+                          FROM ramTypeRequirements AS t1,
+                               invBlueprintTypes AS t2,
+                               invTypeMaterials AS t3
+                          WHERE t1.typeID = t2.blueprintTypeID
+                          AND t3.typeID = requiredTypeID
+                          AND t2.productTypeID = ".$this->buildItems[$i]."
+                          AND activityID = 1
+                          AND damagePerJob > 0
+                          AND recycle = 1";
                 $db->query($query);
+                //echo "<pre>".$query."</pre>";
                 
-                while($line = mysql_fetch_assoc($db->result))
+                if (mysql_num_rows($db->result) > 0)
                 {
-                    $tempBuildID[$line["materialID"]] -= $line["quantity"];
+                    while($line = mysql_fetch_assoc($db->result))
+                    {
+                        $tempBuildID[$line["materialID"]] -= $line["quantity"];
+                    }
                 }
-                
                 //remove negative values from the subtraction and add ME effect
                 foreach($tempBuildID as $materialID => $quantity)
                 {
@@ -181,7 +188,8 @@ class compCalc
                           AND activityID = 1
                           AND damagePerJob > 0";
                 $db->query($query);
-                
+                //echo "<pre>".$query."</pre>";
+
                 while($line = mysql_fetch_assoc($db->result))
                 {
                     $buildID[$line["materialID"]] += $line["quantity"] * $this->buildCount[$i];
@@ -226,7 +234,7 @@ class compCalc
     
     function displayResult()
     {
-        echo "<u>Minerals</u><br><br>";
+        echo "<u>Minerals</u> (".sizeof($this->minerals).") <br><br>";
         if ($this->minerals)
         {
             foreach($this->minerals as $materialID => $quantity)
@@ -238,7 +246,7 @@ class compCalc
         else
             echo "None<br>";
         
-        echo "<br><u>T2 Components</u><br><br>";
+        echo "<br><u>T2 Components</u> (".sizeof($this->components).") <br><br>";
         if ($this->components)
         {
             foreach($this->components as $materialID => $quantity)
@@ -250,7 +258,7 @@ class compCalc
         else
             echo "None<br>";
 
-        echo "<br><u>Trade Goods</u><br><br>";
+        echo "<br><u>Trade Goods</u> (".sizeof($this->tradeGoods).") <br><br>";
         if ($this->tradeGoods)
         {
             foreach($this->tradeGoods as $materialID => $quantity)
@@ -262,7 +270,7 @@ class compCalc
         else
             echo "None<br>";
 
-        echo "<br><u>R.A.M.</u><br><br>";
+        echo "<br><u>R.A.M.</u> (".sizeof($this->ram).") <br><br>";
         if ($this->ram)
         {
             foreach($this->ram as $materialID => $quantity)
@@ -274,7 +282,7 @@ class compCalc
         else
             echo "None<br>";
 
-        echo "<br><u>T1 Items</u><br><br>";
+        echo "<br><u>T1 Items</u> (".sizeof($this->t1Items).") <br><br>";
         if ($this->t1Items)
         {
             foreach($this->t1Items as $materialID => $quantity)

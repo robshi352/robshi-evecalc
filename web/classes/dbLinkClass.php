@@ -1,4 +1,5 @@
 <?php
+/*Copyright 2010 @ masubious*/
 
     class dbLink
     {

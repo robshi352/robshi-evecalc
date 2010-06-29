@@ -9,6 +9,7 @@ require_once("classes/siteFunctionsClass.php");
                        "pos" => array("POS Refill Calculation", "pos.php"),
                        "station" => array("Station Locator", "station.php"),
                        "agent" => array("Agent Locator", "agent.php"),
+                       "t1profit" => array("T1 Profit Calculation", "t1profit.php"),
                        "t2comps" => array("T2 Component Calculator", "comp.php"));
 
     $config = parse_ini_file("eveTools.ini", true);
