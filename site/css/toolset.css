@@ -1,6 +1,96 @@
 /* =divs
 ----------------------------------------------- */
 
+body
+{
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    font: small/1.5em georgia, times, serif;
+    color: #333331;
+    text-align: left;
+}
+	
+a
+{
+    color: #c50;
+    text-decoration: none;
+    border-bottom: 1px solid #dca;
+}
+	
+a:visited
+{
+    color: #a86;
+    border: none;
+}
+	
+a:hover
+{
+    color: #000;
+    border-bottom: 1px solid #333331;
+}
+	
+acronym
+{
+    cursor: help;
+    font-style: normal;
+    border: none;
+}
+	
+h1
+{
+    display: none;
+}
+    
+h2
+{
+    font-size: 1.5em;
+    font-weight: normal;
+    color: #922;
+    margin: 0 0 0.6em 0;
+    padding: 0;
+}
+	
+h3
+{
+    width: 420px;
+    height: 20px;
+    margin: 1.2em 0 0.8em 0;
+}
+	
+h3 span
+{
+    display: none;
+    visibility: hidden;
+}
+	
+p
+{
+    text-indent: 2em;
+    font-size: 88%;
+    margin: 0 0 0.6em 0;
+}
+
+strong
+{
+    font-size: 1.0em;
+    font-weight: normal;
+    color: #922;
+    margin: 0 0 0 0;
+    padding: 0;
+    font-style: normal;
+}
+
+em
+{
+    font-size: 1.0em;
+    font-weight: normal;
+    color: #922;
+    margin: 0 0 0 0;
+    padding: 0;
+    font-style: normal;
+}
+
 #menu
 {
     float: left;

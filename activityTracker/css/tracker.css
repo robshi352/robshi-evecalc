@@ -131,6 +131,13 @@ div.production
     /*border: 1px solid red;*/
 }
 
+div.stats
+{
+    float: left;
+    padding: 5px;
+    /*border: 1px solid red;*/
+}
+
 div.clear
 {
     clear: both;

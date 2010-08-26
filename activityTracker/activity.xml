@@ -1,45 +1,79 @@
 <?xml version="1.0"?>
-<activity week="25">
-  <invention>
-    <inventor name="Adrianna King" inventions="30" successful="13" t2ModFactor="1"/>
-    <inventor name="Chetree" inventions="30" successful="16" t2ModFactor="1"/>
-    <inventor name="Diergot" inventions="70" successful="35" t2ModFactor="1"/>
-    <inventor name="Dreysine" inventions="50" successful="22" t2ModFactor="1"/>
-    <inventor name="Gar Karath" inventions="50" successful="18" t2ModFactor="1"/>
-    <inventor name="Kylie Ryan" inventions="30" successful="18" t2ModFactor="0.86666666666667"/>
-    <inventor name="Marbo Slyder" inventions="86" successful="50" t2ModFactor="2.046511627907"/>
-    <inventor name="Nicole Maher" inventions="47" successful="22" t2ModFactor="1"/>
-    <inventor name="Nora Roksi" inventions="60" successful="26" t2ModFactor="0.96666666666667"/>
-    <inventor name="Psuedo Nym" inventions="30" successful="16" t2ModFactor="1"/>
-    <inventor name="WarMakerX" inventions="20" successful="9" t2ModFactor="1"/>
-  </invention>
-  <production>
-    <producer name="Adrianna King" otherCount="" otherUtil="" t2Count="10" t2Util="28.571475812625"/>
-    <producer name="Chetree" otherCount="" otherUtil="" t2Count="31" t2Util="56.481244181951"/>
-    <producer name="Diergot" otherCount="" otherUtil="" t2Count="31" t2Util="39.195501315313"/>
-    <producer name="Dreysine" otherCount="" otherUtil="" t2Count="35" t2Util="45.036780814783"/>
-    <producer name="Gar Karath" otherCount="" otherUtil="" t2Count="27" t2Util="46.644918394376"/>
-    <producer name="Hawk Dresden" otherCount="" otherUtil="" t2Count="1" t2Util="1.5416692157229"/>
-    <producer name="Ignaciaa" otherCount="" otherUtil="" t2Count="25" t2Util="55.817552608387"/>
-    <producer name="Kattenne" otherCount="" otherUtil="" t2Count="11" t2Util="15.078397947087"/>
-    <producer name="Kylie Ryan" otherCount="" otherUtil="" t2Count="11" t2Util="21.167693729652"/>
-    <producer name="Levi Sewell" otherCount="" otherUtil="" t2Count="10" t2Util="29.761953971485"/>
-    <producer name="Lex CmoreCheeks" otherCount="" otherUtil="" t2Count="17" t2Util="36.614147840853"/>
-    <producer name="Lice Pubez" otherCount="10" otherUtil="19.260944545213" t2Count="10" t2Util="26.722266405864"/>
-    <producer name="Marbo Slyder" otherCount="11" otherUtil="44.225271536494" t2Count="11" t2Util="7.9950529018732"/>
-    <producer name="Mauvine Fresco" otherCount="15" otherUtil="27.62698020334" t2Count="5" t2Util="10.580374636863"/>
-    <producer name="Maxine Fresco" otherCount="5" otherUtil="5.2807626996738" t2Count="" t2Util=""/>
-    <producer name="Nicole Maher" otherCount="17" otherUtil="71.446447497433" t2Count="2" t2Util="5.29167541613"/>
-    <producer name="No Brainer" otherCount="17" otherUtil="39.211209013242" t2Count="" t2Util=""/>
-    <producer name="Nora Roksi" otherCount="18" otherUtil="78.954363350469" t2Count="" t2Util=""/>
-    <producer name="Psuedo Nym" otherCount="" otherUtil="" t2Count="8" t2Util="19.04765054175"/>
-    <producer name="TheSpatiqus" otherCount="" otherUtil="" t2Count="16" t2Util="23.279800396495"/>
-    <producer name="ThisJobSucks" otherCount="19" otherUtil="19.66372298896" t2Count="" t2Util=""/>
-    <producer name="Tolimpex" otherCount="" otherUtil="" t2Count="4" t2Util="1.7390901770671"/>
-    <producer name="Trea Dawes" otherCount="" otherUtil="" t2Count="37" t2Util="55.072511693968"/>
-    <producer name="WarMakerX" otherCount="" otherUtil="" t2Count="15" t2Util="34.28577097515"/>
-    <producer name="zach Brannigan" otherCount="" otherUtil="" t2Count="17" t2Util="33.796682864886"/>
-    <producer name="Zariya Zravhnor" otherCount="19" otherUtil="82.13988449055" t2Count="" t2Util=""/>
-  </production>
-  <total inventions="503" successful="245"/>
+<activity>
+  <week number="34">
+    <invention>
+      <inventor name="Chetree" inventions="10" successful="5" t2ModFactor="1"/>
+      <inventor name="Gar Karath" inventions="70" successful="33" t2ModFactor="1"/>
+      <inventor name="Ignaciaa" inventions="10" successful="6" t2ModFactor="1"/>
+      <inventor name="Nicole Maher" inventions="87" successful="43" t2ModFactor="0.88505747126437"/>
+      <inventor name="Nora Roksi" inventions="80" successful="38" t2ModFactor="1"/>
+      <total inventions="257" successful="125"/>
+    </invention>
+    <production>
+      <producer name="Adrianna King" otherCount="0" otherUtil="0" t2Count="10" t2Util="20.22271253574"/>
+      <producer name="Chetree" otherCount="0" otherUtil="0" t2Count="14" t2Util="38.992489415191"/>
+      <producer name="Dark Arachnid15" otherCount="0" otherUtil="0" t2Count="1" t2Util="0.001883138690026"/>
+      <producer name="Dreysine" otherCount="0" otherUtil="0" t2Count="10" t2Util="4.5324009704441"/>
+      <producer name="Gar Karath" otherCount="0" otherUtil="0" t2Count="20" t2Util="53.769478715825"/>
+      <producer name="Ignaciaa" otherCount="0" otherUtil="0" t2Count="10" t2Util="20.996682537341"/>
+      <producer name="janvierr" otherCount="10" otherUtil="65.022581971458" t2Count="0" t2Util="0"/>
+      <producer name="Kylie Ryan" otherCount="0" otherUtil="0" t2Count="4" t2Util="15.96524981404"/>
+      <producer name="Levi Sewell" otherCount="0" otherUtil="0" t2Count="10" t2Util="14.836935882266"/>
+      <producer name="Lex CmoreCheeks" otherCount="0" otherUtil="0" t2Count="9" t2Util="42.854022227314"/>
+      <producer name="Lice Pubez" otherCount="0" otherUtil="0" t2Count="14" t2Util="29.689250730501"/>
+      <producer name="Marbo Slyder" otherCount="5" otherUtil="14.882978623237" t2Count="0" t2Util="0"/>
+      <producer name="Nicole Maher" otherCount="12" otherUtil="77.554618868422" t2Count="4" t2Util="1.3655266354275"/>
+      <producer name="No Brainer" otherCount="7" otherUtil="70" t2Count="0" t2Util="0"/>
+      <producer name="Nora Roksi" otherCount="0" otherUtil="0" t2Count="10" t2Util="15.207914204201"/>
+      <producer name="stlaedart" otherCount="4" otherUtil="20.102505516027" t2Count="0" t2Util="0"/>
+      <producer name="TheSpatiqus" otherCount="0" otherUtil="0" t2Count="26" t2Util="25.248276143458"/>
+      <producer name="Tink Nova" otherCount="10" otherUtil="54.077779905027" t2Count="0" t2Util="0"/>
+      <producer name="Trea Dawes" otherCount="0" otherUtil="0" t2Count="27" t2Util="33.613711760515"/>
+      <producer name="Trippah" otherCount="0" otherUtil="0" t2Count="25" t2Util="35.975167677808"/>
+      <producer name="zach Brannigan" otherCount="0" otherUtil="0" t2Count="10" t2Util="42.000144373966"/>
+      <producer name="Zariya Zravhnor" otherCount="16" otherUtil="94.742276777448" t2Count="0" t2Util="0"/>
+    </production>
+  </week>
+  <week number="33">
+    <invention>
+      <inventor name="Chetree" inventions="10" successful="6" t2ModFactor="1"/>
+      <inventor name="Diergot" inventions="20" successful="8" t2ModFactor="0.9"/>
+      <inventor name="Dreysine" inventions="60" successful="39" t2ModFactor="1"/>
+      <inventor name="Gar Karath" inventions="33" successful="15" t2ModFactor="1"/>
+      <inventor name="Ignaciaa" inventions="60" successful="29" t2ModFactor="1"/>
+      <inventor name="Kylie Ryan" inventions="120" successful="65" t2ModFactor="1"/>
+      <inventor name="Marbo Slyder" inventions="40" successful="24" t2ModFactor="3.25"/>
+      <inventor name="Nicole Maher" inventions="70" successful="35" t2ModFactor="1"/>
+      <inventor name="Nora Roksi" inventions="70" successful="34" t2ModFactor="0.88571428571429"/>
+      <total inventions="483" successful="255"/>
+    </invention>
+    <production>
+      <producer name="Adrianna King" otherCount="0" otherUtil="0" t2Count="19" t2Util="37.101251820853"/>
+      <producer name="Chetree" otherCount="0" otherUtil="0" t2Count="17" t2Util="35.611120388757"/>
+      <producer name="Dark Arachnid15" otherCount="0" otherUtil="0" t2Count="10" t2Util="15.872033518574"/>
+      <producer name="Diergot" otherCount="0" otherUtil="0" t2Count="11" t2Util="19.314516062361"/>
+      <producer name="Dreysine" otherCount="0" otherUtil="0" t2Count="20" t2Util="18.521856021587"/>
+      <producer name="Gar Karath" otherCount="5" otherUtil="9.3164836582071" t2Count="19" t2Util="36.789594559515"/>
+      <producer name="Ignaciaa" otherCount="0" otherUtil="0" t2Count="10" t2Util="23.809563177188"/>
+      <producer name="janvierr" otherCount="10" otherUtil="61.841372092216" t2Count="0" t2Util="0"/>
+      <producer name="Kattenne" otherCount="22" otherUtil="64.567567076004" t2Count="0" t2Util="0"/>
+      <producer name="Kattrinne" otherCount="19" otherUtil="48.21634956407" t2Count="0" t2Util="0"/>
+      <producer name="Kylie Ryan" otherCount="0" otherUtil="0" t2Count="28" t2Util="38.941516107004"/>
+      <producer name="Levi Sewell" otherCount="0" otherUtil="0" t2Count="20" t2Util="46.232219299304"/>
+      <producer name="Lex CmoreCheeks" otherCount="0" otherUtil="0" t2Count="30" t2Util="44.707415190832"/>
+      <producer name="Lice Pubez" otherCount="0" otherUtil="0" t2Count="20" t2Util="31.74608423625"/>
+      <producer name="Marbo Slyder" otherCount="14" otherUtil="36.900771992017" t2Count="13" t2Util="15.2381204334"/>
+      <producer name="Nicole Maher" otherCount="12" otherUtil="36.120959194708" t2Count="7" t2Util="12.697441629368"/>
+      <producer name="No Brainer" otherCount="17" otherUtil="53.336281971366" t2Count="10" t2Util="14.22224573784"/>
+      <producer name="Nora Roksi" otherCount="5" otherUtil="24.864128412911" t2Count="10" t2Util="20.107176103135"/>
+      <producer name="stlaedart" otherCount="5" otherUtil="20.003984794948" t2Count="0" t2Util="0"/>
+      <producer name="TheSpatiqus" otherCount="0" otherUtil="0" t2Count="30" t2Util="37.939398047946"/>
+      <producer name="Tink Nova" otherCount="10" otherUtil="71.48126898358" t2Count="0" t2Util="0"/>
+      <producer name="tlaedart" otherCount="0" otherUtil="0" t2Count="10" t2Util="13.75994338615"/>
+      <producer name="Trea Dawes" otherCount="0" otherUtil="0" t2Count="27" t2Util="37.560577977146"/>
+      <producer name="Trippah" otherCount="0" otherUtil="0" t2Count="33" t2Util="43.451378061141"/>
+      <producer name="zach Brannigan" otherCount="0" otherUtil="0" t2Count="22" t2Util="37.301648977594"/>
+      <producer name="Zariya Zravhnor" otherCount="16" otherUtil="80.080324206885" t2Count="0" t2Util="0"/>
+    </production>
+  </week>
 </activity>
