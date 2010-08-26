@@ -1,0 +1,268 @@
+/* General
+----------------------------------------------- */
+
+body
+{
+    margin: 0;
+    padding: 0;
+    background: #fff;
+    font: small/1.5em georgia, times, serif;
+    color: #333331;
+    text-align: left;
+}
+	
+a
+{
+    color: #c50;
+    text-decoration: none;
+    border-bottom: 1px solid #dca;
+}
+	
+a:visited
+{
+    color: #a86;
+    border: none;
+}
+	
+a:hover
+{
+    color: #000;
+    border-bottom: 1px solid #333331;
+}
+	
+acronym
+{
+    cursor: help;
+    font-style: normal;
+    border: none;
+}
+	
+h1
+{
+    display: none;
+}
+    
+h2
+{
+    font-size: 1.5em;
+    font-weight: normal;
+    color: #922;
+    margin: 0 0 0.6em 0;
+    padding: 0;
+}
+	
+h3
+{
+    width: 420px;
+    height: 20px;
+    margin: 1.2em 0 0.8em 0;
+}
+	
+h3 span
+{
+    display: none;
+    visibility: hidden;
+}
+	
+p
+{
+    text-indent: 2em;
+    font-size: 88%;
+    margin: 0 0 0.6em 0;
+}
+
+strong
+{
+    font-size: 1.0em;
+    font-weight: normal;
+    color: #922;
+    margin: 0 0 0 0;
+    padding: 0;
+    font-style: normal;
+}
+
+em
+{
+    font-size: 1.0em;
+    font-weight: normal;
+    color: #922;
+    margin: 0 0 0 0;
+    padding: 0;
+    font-style: normal;
+}
+
+/* The following hack is to correct paragraph text size in IE/WIN */
+
+/* \*/ * html body p { font-size: 80%; } /* */
+
+
+/* Divs
+----------------------------------------------- */
+
+#menu
+{
+    float: left;
+    /*border: 1px solid black;*/
+    padding: 5px;
+    margin-bottom: 10px;
+    text-align: left;
+    overflow: hidden;
+}
+
+#content
+{
+    float: left;
+    /*padding: 10px;*/
+    overflow: hidden;
+    /*width: 90%;*/
+}
+
+div.invention
+{
+    float: left;
+    padding: 5px;
+    /*border: 1px solid black;*/
+}
+
+div.production
+{
+    float: left;
+    padding: 5px;
+    /*border: 1px solid red;*/
+}
+
+div.stats
+{
+    float: left;
+    padding: 5px;
+    /*border: 1px solid red;*/
+}
+
+div.clear
+{
+    clear: both;
+    /*border: 1px solid blue;*/
+}
+
+#inventionWrapper
+{
+    /*border: 1px solid black;*/
+}
+
+#productionWrapper
+{
+    /*border: 1px solid black;*/
+}
+
+/* -=- tables -=-
+----------------------------------------------- */
+
+table
+{
+    border-collapse: collapse;
+    border: 1px solid #000;
+    /*font: normal 80%/140% arial, helvetica, sans-serif;*/
+    font-size: 90%;
+    color: #555;
+    background: #fff;
+}
+
+td, th
+{
+    border: 1px dotted #bbb;
+    padding: .5em;
+    /*line-height: 1em;*/
+}
+
+td.mark, th.mark
+{
+    border-right: 1px solid #bbb;
+}
+
+tr.mark
+{
+    border-top: 1px solid #bbb;
+}
+
+td.vmark, th.vmark
+{
+    border-left: 1px solid #bbb;
+}
+
+tr.vmark
+{
+    border-bottom: 1px solid #bbb;
+}
+
+caption
+{
+    padding: 0 0 .5em 0;
+    text-align: left;
+    font-size: 1.4em;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #333;
+    background: transparent;
+}
+
+/* =links */
+
+table a
+{
+    color: #c50;
+    text-decoration: none;
+    border-bottom: 1px solid #dca;
+    background: transparent;
+}
+
+table a:visited
+{
+    color: #a86;
+    border: none;
+}
+
+table a:hover
+{
+    color: #000;
+    border-bottom: 1px solid #333331;
+}
+
+/* =head =foot */
+
+thead th, tfoot th
+{
+    border: 2px solid #000;
+    text-align: left;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #333;
+    background: transparent;
+}
+
+tfoot td
+{
+    border: 2px solid #000;
+}
+
+/* =body */
+
+tbody th, tbody td
+{
+    vertical-align: middle;
+    text-align: center;
+}
+
+tbody th
+{
+    white-space: nowrap;
+}
+
+.odd
+{
+    background: #fcfcfc;
+}
+
+tbody tr:hover
+{
+    background: #fafafa;
+}
