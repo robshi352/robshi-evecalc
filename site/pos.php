@@ -1,5 +1,5 @@
 <?php
-    echo "<form action=".$PHP_SELF."?func=".$function." method=POST>\n";
+    echo "<form action="."http://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"]." method=POST>\n";
 ?>
 
 <select name=tower>

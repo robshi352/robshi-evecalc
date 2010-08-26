@@ -4,13 +4,10 @@ class compCalc
 {
     public $submitted;
 
-    function compCalc($IGB)
+    function __construct($db)
     {
-        global $db;
-        
-        $this->IGB = (!$IGB === false);
-        
         $this->formCount = 3;
+        $this->db = $db;
         //select the top level 'Ship Equipment' group
         $query = "SELECT COUNT(*)-1 AS level,
                          t1.lft AS lft,
@@ -22,7 +19,7 @@ class compCalc
                   AND t1.marketGroupID = t3.marketGroupID
                   AND t3.marketGroupName = 'Ship Equipment'
                   GROUP BY t1.lft";
-        $db->query($query);
+        $this->db->query($query);
         
         while($line = mysql_fetch_assoc($db->result))
         {
@@ -43,7 +40,7 @@ class compCalc
                   AND published = 1
                   AND t3.metaGroupID = 2
                   ORDER BY t1.typeName";
-        $db->query($query);
+        $this->db->query($query);
         
         //echo "<pre>".$query."</pre>";
         $this->t2Items[0] = "select one";
@@ -83,7 +80,7 @@ class compCalc
     {
         global $siteFunctions;
         
-        echo "<form method=POST action=".$PHP_SELF."?func=".$siteFunctions->currentFunction.">";
+        echo "<form method=POST action="."http://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"].">";
         echo "<div style=\"visibility:hidden;width:0px; height:0px;\"><input type=submit value=calculate name=submit></div>";
         for($i=0; $i<$this->formCount; $i++)
         {
@@ -122,7 +119,7 @@ class compCalc
                 $query = "SELECT blueprintTypeID, wasteFactor
                           FROM invBlueprintTypes
                           WHERE productTypeID = ".$this->buildItems[$i];
-                $db->query($query);
+                $this->db->query($query);
                 
                 $line = mysql_fetch_assoc($db->result);
                 $blueprintTypeID = $line["blueprintTypeID"];
@@ -136,7 +133,7 @@ class compCalc
                                invTypes AS t2
                           WHERE t1.typeID = ".$this->buildItems[$i]."
                           AND t1.materialTypeID = t2.typeID";
-                $db->query($query);
+                $this->db->query($query);
                 
                 //echo "<pre>".$query."</pre>";
                 while($line = mysql_fetch_assoc($db->result))
@@ -158,7 +155,7 @@ class compCalc
                           AND activityID = 1
                           AND damagePerJob > 0
                           AND recycle = 1";
-                $db->query($query);
+                $this->db->query($query);
                 //echo "<pre>".$query."</pre>";
                 
                 if (mysql_num_rows($db->result) > 0)
@@ -187,7 +184,7 @@ class compCalc
                           AND t3.productTypeID = ".$this->buildItems[$i]."
                           AND activityID = 1
                           AND damagePerJob > 0";
-                $db->query($query);
+                $this->db->query($query);
                 //echo "<pre>".$query."</pre>";
 
                 while($line = mysql_fetch_assoc($db->result))
@@ -205,35 +202,46 @@ class compCalc
 
         foreach($this->buildName as $materialID => $materialName)
         {
-            $query = "SELECT t3.marketGroupName AS marketGroupName
-                      FROM invTypes AS t1,
-                           invMarketGroups AS t2,
-                           invMarketGroups AS t3
-                      WHERE typeID = ".$materialID."
-                      AND t1.marketGroupID = t2.marketGroupID
-                      AND t2.parentGroupID = t3.marketGroupID";
-            $db->query($query);
-            
-            $line = mysql_fetch_assoc($db->result);
-            $marketGroupName = trim($line["marketGroupName"]);
-            
-            switch($marketGroupName)
+            if ($buildID[$materialID] != 0)
             {
-                case "Ore & Minerals": $this->minerals[$materialID] = $buildID[$materialID];
-                        break;
-                case "Construction Components": $this->components[$materialID] = $buildID[$materialID];
-                        break;
-                case "Trade Goods": $this->tradeGoods[$materialID] = $buildID[$materialID];
-                        break;
-                case "Research & Invention": $this->ram[$materialID] = $buildID[$materialID];
-                        break;
-                default: $this->t1Items[$materialID] = $buildID[$materialID];
+                $query = "SELECT t3.marketGroupName AS marketGroupName
+                          FROM invTypes AS t1,
+                               invMarketGroups AS t2,
+                               invMarketGroups AS t3
+                          WHERE typeID = ".$materialID."
+                          AND t1.marketGroupID = t2.marketGroupID
+                          AND t2.parentGroupID = t3.marketGroupID";
+                $this->db->query($query);
+                
+                $line = mysql_fetch_assoc($db->result);
+                $marketGroupName = trim($line["marketGroupName"]);
+                
+                switch($marketGroupName)
+                {
+                    case "Ore & Minerals": $this->minerals[$materialID] = $buildID[$materialID];
+                            break;
+                    case "Construction Components": $this->components[$materialID] = $buildID[$materialID];
+                            break;
+                    case "Trade Goods": $this->tradeGoods[$materialID] = $buildID[$materialID];
+                            break;
+                    case "Planetary Materials": $this->tradeGoods[$materialID] = $buildID[$materialID];
+                            break;
+                    case "Research & Invention": $this->ram[$materialID] = $buildID[$materialID];
+                            break;
+                    default: $this->t1Items[$materialID] = $buildID[$materialID];
+                }
             }
         }
     } // end function
     
     function displayResult()
     {
+        echo '<div style="float:right;">';
+        echo "<em>(Total: ";
+        echo sizeof($this->minerals) + sizeof($this->components) + sizeof($this->tradeGoods) + sizeof($this->ram) + sizeof($this->t1Items);
+        echo ")</em>";
+        echo "</div>";
+        
         echo "<u>Minerals</u> (".sizeof($this->minerals).") <br><br>";
         if ($this->minerals)
         {

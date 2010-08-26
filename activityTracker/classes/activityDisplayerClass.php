@@ -21,11 +21,14 @@ class activityDisplayer
         foreach($trackingInfo as $jobID => $jobInfo)
         {
             if ($jobID != "cached")
-                printf("<em>%s</em> | %s | %s - %s | installed by %s | %s<br>", $jobID,
+                printf("<em>%s</em> | x%s | %s | %s - %s | by %s | in %s | factor %s | %s<br>", $jobID,
+                                                                                $jobInfo["runs"],
                                                                                 $jobInfo["activity"],
                                                                                 $jobInfo["beginProductionTime"],
                                                                                 $jobInfo["endProductionTime"],
                                                                                 $jobInfo["installerID"],
+                                                                                $jobInfo["containerTypeID"],
+                                                                                $jobInfo["timeFactor"],
                                                                                 $jobInfo["trackingStatus"]);
         }
         printf("<em>Cached until</em>: %s", $trackingInfo["cached"]);
@@ -33,7 +36,7 @@ class activityDisplayer
     
     function displayInvention($inventionData)
     {
-        printf('<div class="invention">', $inventionData["divID"]);
+        printf('<div class="invention">');
         printf('<em><u>Invention Report for Week %s</u></em><br>', $inventionData["week"]);
         printf("%s - %s <br><br>\n", $inventionData["startDate"], $inventionData["endDate"]);
         
@@ -70,7 +73,7 @@ class activityDisplayer
     
     function displayProduction($productionData)
     {
-        printf('<div class="production">', $productionData["divID"]);
+        printf('<div class="production">');
         printf('<em><u>Production Report for Week %s</u></em><br>', $productionData["Week"]);
         printf("%s - %s <br><br>\n", $productionData["startDate"], $productionData["endDate"]);
         
@@ -87,30 +90,80 @@ class activityDisplayer
             echo "<th>% T2 Util</th>";
             echo "<th>% Total Util</th>";
             echo "</tr>\n";
-            foreach($productionData["data"] as $productor => $productorData)
+            foreach($productionData["data"] as $producer => $producerData)
             {
                 echo "<tr>";
-                printf('<td>%s</td>', $productor);
+                printf('<td>%s</td>', $producer);
                 
-                if ($productorData["otherCount"] > 0)
-                    printf('<td>%s</td>', $productorData["otherCount"]);
-                else
-                    echo "<td>-</td>";
-                
-                if ($productorData["otherUtil"] > 0)
-                    printf('<td>%.2f%%</td>', $productorData["otherUtil"]);
+                if ($producerData["otherCount"] > 0)
+                    printf('<td>%s</td>', $producerData["otherCount"]);
                 else
                     echo "<td>-</td>";
                 
-                if ($productorData["t2Count"] > 0)
-                    printf('<td>%s</td>', $productorData["t2Count"]);
+                if ($producerData["otherUtil"] > 0)
+                    printf('<td>%.2f%%</td>', $producerData["otherUtil"]);
                 else
                     echo "<td>-</td>";
-                if ($productorData["t2Util"] > 0)
-                    printf('<td>%.2f%%</td>', $productorData["t2Util"]);
+                
+                if ($producerData["t2Count"] > 0)
+                    printf('<td>%s</td>', $producerData["t2Count"]);
                 else
                     echo "<td>-</td>";
-                printf('<td><em>%.2f%%</em></td>', $productorData["t2Util"] + $productorData["otherUtil"]);
+                if ($producerData["t2Util"] > 0)
+                    printf('<td>%.2f%%</td>', $producerData["t2Util"]);
+                else
+                    echo "<td>-</td>";
+                printf('<td><em>%.2f%%</em></td>', $producerData["t2Util"] + $producerData["otherUtil"]);
+                echo "</tr>\n";
+            }
+            echo "</table>";
+            echo "</div>";
+        }
+    }
+    
+    function displayStats($statData)
+    {
+        printf('<div class="stats">');
+        printf('<em><u>Stats for Week %s</u></em><br>', $statData["Week"]);
+        printf("%s - %s <br><br>\n", $statData["startDate"], $statData["endDate"]);
+        
+        if (!$statData["data"])
+            echo "<em>Nothing happened.</em>";
+        else
+        {
+            echo "<table>\n";
+            echo "<tr>";
+            echo "<th>Item</th>";
+            echo "<th>Inventions</th>";
+            echo "<th>Successful</th>";
+            echo "<th>%</th>";
+            echo "<th>built</th>";
+            echo "</tr>\n";
+            foreach($statData["data"] as $itemName => $itemData)
+            {
+                echo "<tr>";
+                printf('<td><em>%s</em></td>', $itemName);
+                
+                if ($itemData["invcnt"] > 0)
+                    printf('<td>%s</td>', $itemData["invcnt"]);
+                else
+                    echo "<td>-</td>";
+                
+                if ($itemData["invsucc"] > 0)
+                    printf('<td>%s</td>', $itemData["invsucc"]);
+                else
+                    echo "<td>-</td>";
+                
+                if ($itemData["invcnt"] > 0)
+                    printf('<td>%.2f%%</td>', $itemData["invsucc"] / $itemData["invcnt"] * 100);
+                else
+                    echo "<td>-</td>";
+                    
+                if ($itemData["prodcnt"] > 0)
+                    printf('<td>%s</td>', $itemData["prodcnt"]);
+                else
+                    echo "<td>-</td>";
+                    
                 echo "</tr>\n";
             }
             echo "</table>";

@@ -42,21 +42,6 @@ class activityTracker
             $this->ale = AleFactory::getEVEOnline();
             //set user credentials, third parameter $characterID is also possible;
             $this->ale->setCredentials($this->userID, $this->apiKey, $this->charID);
-            //all errors are handled by exceptions
-            //let's fetch characters first.
-            $account = $this->ale->account->Characters();
-            //you can traverse rowset element with attribute name="characters" as array
-            foreach ($account->result->characters as $character)
-            {
-                //this is how you can get attributes of element
-                $characterID = (string) $character->characterID;
-                //set characterID for CharacterSheet
-                $this->ale->setCharacterID($characterID);
-                if($character->name == $this->charName)
-                {
-                    break;
-                }
-            }
         }
         catch (Exception $e)
         {
@@ -85,7 +70,7 @@ class activityTracker
                   FROM ".$this->prefix."ActivityTracking
                   WHERE installerID NOT IN (
                       SELECT memberID
-                      FROM pecoMemberID)";
+                      FROM ".$this->prefix."MemberID)";
         $this->db->query($query);
         
         $charIDs = array("ids" => array());
@@ -117,6 +102,16 @@ class activityTracker
             
             foreach ($corpJobs->result->jobs as $job)
             {
+                    $query2 = "SELECT typeName = 'Mobile Laboratory' as lab
+                               FROM invTypes
+                               WHERE typeID = ".$job->containerTypeID;
+                    $this->db->query($query2);
+                    $lab = mysql_fetch_assoc($this->db->result);
+                    if ($lab["lab"])
+                        $timeFactor = 0.5;
+                    else
+                        $timeFactor = 1;
+                
                 $query = "INSERT INTO ".$this->prefix."ActivityTracking
                           VALUES (
                             ".$job->jobID.",
@@ -126,7 +121,9 @@ class activityTracker
                             '".$job->endProductionTime."',
                             '".date("o-m-d H:i:s", $now)."',
                             ".$job->outputTypeID.",
-                            ".$job->completedStatus.")";
+                            ".$job->runs.",
+                            ".$job->completedStatus.",
+                            ".$timeFactor.")";
                 if (($job->activityID == $this->inventionID) || ($job->activityID == $this->productionID))
                 {
                     if ($job->activityID == $this->inventionID)
@@ -137,6 +134,9 @@ class activityTracker
                     $trackingInfo[$job->jobID]["installerID"] = $job->installerID;
                     $trackingInfo[$job->jobID]["beginProductionTime"] = $job->beginProductionTime;
                     $trackingInfo[$job->jobID]["endProductionTime"] = $job->endProductionTime;
+                    $trackingInfo[$job->jobID]["containerTypeID"] = $job->containerTypeID;
+                    $trackingInfo[$job->jobID]["timeFactor"] = $timeFactor;
+                    $trackingInfo[$job->jobID]["runs"] = $job->runs;
                     
                     if (($job->completed) && ($job->activityID == $this->inventionID))
                     {
@@ -177,11 +177,11 @@ class activityTracker
         $query = "SELECT memberName as name,
                          count(*) as inventions,
                          sum(completedStatus) as successful,
-                         sum(UNIX_TIMESTAMP(endProductionTime) - UNIX_TIMESTAMP(beginProductionTime)) as prodTime
+                         sum((UNIX_TIMESTAMP(endProductionTime) - UNIX_TIMESTAMP(beginProductionTime)) / timeFactor)  as prodTime
                   FROM ".$this->prefix."ActivityTracking, ".$this->prefix."MemberID
                   WHERE installerID = memberID
                   AND entryDate >= '".date("o-m-d H:i:s", $startTime)."'
-                  AND entryDate < '".date("o-m-d H:i:s", $endTime)."'
+                  AND entryDate <= '".date("o-m-d H:i:s", $endTime)."'
                   AND activityID = ".$this->inventionID."
                   GROUP BY installerID
                   ORDER BY memberName";
@@ -200,7 +200,7 @@ class activityTracker
             {
                 $inventionData["data"][$line["name"]]["inventions"] = $line["inventions"];
                 $inventionData["data"][$line["name"]]["successful"] = $line["successful"];
-                $inventionData["data"][$line["name"]]["t2ModFactor"] =$line["prodTime"] / 3600 / 1.25 / $line["inventions"];
+                $inventionData["data"][$line["name"]]["t2ModFactor"] = $line["prodTime"] / 3600 / 2.5 / $line["inventions"];
 
                 $inventionData["totalInventions"] += $line["inventions"];
                 $inventionData["totalSuccessful"] += $line["successful"];
@@ -281,45 +281,119 @@ class activityTracker
         return $productionData;
     }
     
-    function generateXML($lastWeekStart, $lastWeekEnd)
+    function getStatData($startTime, $endTime)
     {
-        $inventionData = $this->getInventionData($lastWeekStart, $lastWeekEnd);
-        $productionData = $this->getProductionData($lastWeekStart, $lastWeekEnd);
-
-        $xml = new SimpleXMLElement("<activity></activity>");
+        $statData["startDate"] = date("F jS Y", $startTime);
+        $statData["endDate"] = date("F jS Y", $endTime);
+        $statData["Week"] = date("W", $startTime);
         
-        //$invention  = $xml->addChild("invention");
-        $xml->addAttribute("week", $inventionData["week"]);
-        $invention = $xml->addChild("invention");
-        $production = $xml->addChild("production");
+        //fetch invention data
+        $query = "SELECT t3.typeName, COUNT(*) AS cnt, SUM(t1.completedStatus) AS succ
+                    FROM ".$this->prefix."ActivityTracking AS t1, invBlueprintTypes AS t2, invTypes as t3
+                    WHERE t1.outputTypeID = t2.blueprintTypeID
+                    AND t2.productTypeID = t3.typeID
+                    AND t1.activityID = 8
+                    AND t1.entryDate > '".date("o-m-d H:i:s", $startTime)."'
+                    AND t1.entryDate <= '".date("o-m-d H:i:s", $endTime)."'
+                    GROUP BY t1.outputTypeID
+                    ORDER BY t3.typeName";
+        //echo "<pre>".$query."</pre>";
+        $this->db->query($query);
         
-        if ($inventionData["data"])
+        while($line = mysql_fetch_assoc($this->db->result))
         {
-            foreach($inventionData["data"] as $inventor => $inventorDetails)
-            {
-                $name = $invention->addChild("inventor");
-                $name->addAttribute("name", $inventor);
-                $name->addAttribute("inventions", $inventorDetails["inventions"]);
-                $name->addAttribute("successful", $inventorDetails["successful"]);
-                $name->addAttribute("t2ModFactor", $inventorDetails["t2ModFactor"]);
-            }
-            
-            $name = $xml->addChild("total");
-            $name->addAttribute("inventions", $inventionData["totalInventions"]);
-            $name->addAttribute("successful", $inventionData["totalSuccessful"]);
+            $statData["data"][$line["typeName"]]["invcnt"] += $line["cnt"];
+            $statData["data"][$line["typeName"]]["invsucc"] += $line["succ"];
         }
         
-        if ($productionData["data"])
+        //fetch production data
+        $query = "SELECT t2.typeName, SUM(t1.runs) AS cnt
+                    FROM ".$this->prefix."ActivityTracking AS t1, invTypes as t2
+                    WHERE t1.outputTypeID = t2.typeID
+                    AND t1.activityID = 1
+                    AND t1.endProductionTime > '".date("o-m-d H:i:s", $startTime)."'
+                    GROUP BY t1.outputTypeID
+                    ORDER BY t2.typeName";
+        //echo "<pre>".$query."</pre>";
+        $this->db->query($query);
+        
+        while($line = mysql_fetch_assoc($this->db->result))
         {
-            foreach($productionData["data"] as $producer => $producerDetails)
+            $statData["data"][$line["typeName"]]["prodcnt"] += $line["cnt"];
+        }
+        ksort($statData["data"]);
+        
+        return $statData;
+    }
+    
+    function generateXML($weekCount, $currentWeekStart)
+    {
+        $weekDuration = 7 * 24 * 60 * 60;
+        
+        
+        $weekStart = $currentWeekStart;
+        $weekEnd = $weekStart + $weekDuration - 1;
+        
+        $xml = new SimpleXMLElement("<activity></activity>");
+        
+        for ($i = 1; $i <= $weekCount; $i++)
+        {
+            $inventionData = $this->getInventionData($weekStart, $weekEnd);
+            $productionData = $this->getProductionData($weekStart, $weekEnd);
+
+            $week = $xml->addChild("week");
+            $week->addAttribute("number", $inventionData["week"]);
+            
+            $invention = $week->addChild("invention");
+            $production = $week->addChild("production");
+            
+            if ($inventionData["data"])
             {
-                $name = $production->addChild("producer");
-                $name->addAttribute("name", $producer);
-                $name->addAttribute("otherCount", $producerDetails["otherCount"]);
-                $name->addAttribute("otherUtil", $producerDetails["otherUtil"]);
-                $name->addAttribute("t2Count", $producerDetails["t2Count"]);
-                $name->addAttribute("t2Util", $producerDetails["t2Util"]);
+                foreach($inventionData["data"] as $inventor => $inventorDetails)
+                {
+                    $name = $invention->addChild("inventor");
+                    $name->addAttribute("name", $inventor);
+                    $name->addAttribute("inventions", $inventorDetails["inventions"]);
+                    $name->addAttribute("successful", $inventorDetails["successful"]);
+                    $name->addAttribute("t2ModFactor", $inventorDetails["t2ModFactor"]);
+                }
+                
+                $name = $invention->addChild("total");
+                $name->addAttribute("inventions", $inventionData["totalInventions"]);
+                $name->addAttribute("successful", $inventionData["totalSuccessful"]);
             }
+            
+            if ($productionData["data"])
+            {
+                foreach($productionData["data"] as $producer => $producerDetails)
+                {
+                    $name = $production->addChild("producer");
+                    $name->addAttribute("name", $producer);
+                    
+                    if ($producerDetails["otherCount"])
+                        $name->addAttribute("otherCount", $producerDetails["otherCount"]);
+                    else
+                        $name->addAttribute("otherCount", 0);
+                        
+                    if ($producerDetails["otherUtil"])
+                        $name->addAttribute("otherUtil", $producerDetails["otherUtil"]);
+                    else
+                        $name->addAttribute("otherUtil", 0);
+                        
+                    if ($producerDetails["t2Count"])
+                        $name->addAttribute("t2Count", $producerDetails["t2Count"]);
+                    else
+                        $name->addAttribute("t2Count", 0);
+                        
+                    if ($producerDetails["t2Util"])
+                        $name->addAttribute("t2Util", $producerDetails["t2Util"]);
+                    else
+                        $name->addAttribute("t2Util", 0);
+                }
+            }
+            
+            $weekStart = $weekStart - $weekDuration;
+            $weekEnd = $weekEnd - $weekDuration;
         }
         
         $dom = new DOMDocument('1.0');

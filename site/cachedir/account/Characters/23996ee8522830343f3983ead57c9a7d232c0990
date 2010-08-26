@@ -1,7 +1,7 @@
-2010-05-31 10:45:35
+2010-07-22 21:15:41
 <?xml version='1.0' encoding='UTF-8'?>
 <eveapi version="2">
-  <currentTime>2010-05-31 09:45:35</currentTime>
+  <currentTime>2010-07-22 20:32:38</currentTime>
   <result>
     <rowset name="characters" key="characterID" columns="name,characterID,corporationName,corporationID">
       <row name="Ver Kar" characterID="1028254255" corporationName="School of Applied Knowledge" corporationID="1000044" />
@@ -9,5 +9,5 @@
       <row name="Gar Karath" characterID="1355761707" corporationName="Precision Collision" corporationID="2027476067" />
     </rowset>
   </result>
-  <cachedUntil>2010-05-31 10:45:35</cachedUntil>
+  <cachedUntil>2010-07-22 21:15:41</cachedUntil>
 </eveapi>
