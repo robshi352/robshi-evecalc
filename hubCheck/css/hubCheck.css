@@ -106,83 +106,12 @@ em
 /* Divs
 ----------------------------------------------- */
 
-#menu
+div #hubForm
 {
-    float: right;
+    float: left;
     border: 1px solid black;
+    margin: 10px;
     padding: 10px;
-    margin-bottom: 10px;
-    text-align: left;
-    overflow: hidden;
-}
-
-#content
-{
-    float: left;
-    /*padding: 10px;*/
-    overflow: hidden;
-    /*width: 90%;*/
-}
-
-div.invention
-{
-    float: left;
-    padding: 5px;
-    /*border: 1px solid black;*/
-}
-
-div.production
-{
-    float: left;
-    padding: 5px;
-    /*border: 1px solid red;*/
-}
-
-div.stats
-{
-    float: left;
-    padding: 5px;
-    /*border: 1px solid red;*/
-}
-
-div.clear
-{
-    clear: both;
-    /*border: 1px solid blue;*/
-}
-
-#inventionWrapper
-{
-    /*border: 1px solid black;*/
-}
-
-#productionWrapper
-{
-    /*border: 1px solid black;*/
-}
-
-div.posData
-{
-    float: left;
-    padding: 5px;
-    margin: 5px;
-    border: 1px solid black;
-}
-
-div.clear
-{
-    clear: both;
-    /*border: 1px solid blue;*/
-}
-
-#inventionWrapper
-{
-    /*border: 1px solid black;*/
-}
-
-#productionWrapper
-{
-    /*border: 1px solid black;*/
 }
 
 /* -=- tables -=-

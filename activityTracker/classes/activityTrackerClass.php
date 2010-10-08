@@ -9,7 +9,6 @@ class activityTracker
 
         $this->userID   = $config["user"]["userID"];
         $this->apiKey   = $config["user"]["apiKey"];
-        $this->charName = $config["user"]["charName"];
         $this->charID   = $config["user"]["charID"];
         
         $this->db = new dbLink($config["db"]["host"],
