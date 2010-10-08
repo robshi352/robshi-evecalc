@@ -6,8 +6,13 @@ class compCalc
 
     function __construct($db)
     {
+        require_once("classes/dbLinkClass.php");
+        $config = parse_ini_file("eveTools.ini", true);
+
+        $this->db = new dbLink($config["db"]["host"], $config["db"]["user"], $config["db"]["password"], $config["db"]["database"]);
+        
         $this->formCount = 3;
-        $this->db = $db;
+
         //select the top level 'Ship Equipment' group
         $query = "SELECT COUNT(*)-1 AS level,
                          t1.lft AS lft,
@@ -21,7 +26,7 @@ class compCalc
                   GROUP BY t1.lft";
         $this->db->query($query);
         
-        while($line = mysql_fetch_assoc($db->result))
+        while($line = mysql_fetch_assoc($this->db->result))
         {
             if ($line["level"] == 0)
             {
@@ -44,7 +49,7 @@ class compCalc
         
         //echo "<pre>".$query."</pre>";
         $this->t2Items[0] = "select one";
-        while($line = mysql_fetch_assoc($db->result))
+        while($line = mysql_fetch_assoc($this->db->result))
         {
             $this->t2Items[$line["typeID"]] = $line["typeName"];
         }
@@ -106,8 +111,6 @@ class compCalc
     
     function evaluateForm()
     {
-        global $db;
-        
         $me = -4;
         
         for($i=0; $i<$this->formCount; $i++)
@@ -121,7 +124,7 @@ class compCalc
                           WHERE productTypeID = ".$this->buildItems[$i];
                 $this->db->query($query);
                 
-                $line = mysql_fetch_assoc($db->result);
+                $line = mysql_fetch_assoc($this->db->result);
                 $blueprintTypeID = $line["blueprintTypeID"];
                 $wasteFactor = $line["wasteFactor"] / 100;
                 
@@ -136,7 +139,7 @@ class compCalc
                 $this->db->query($query);
                 
                 //echo "<pre>".$query."</pre>";
-                while($line = mysql_fetch_assoc($db->result))
+                while($line = mysql_fetch_assoc($this->db->result))
                 {
                     //echo "1: ".$line["materialName"]." (".$line["materialID"].") - ".$line["quantity"]."<br>";
                     $tempBuildID[$line["materialID"]] += $line["quantity"];
@@ -158,9 +161,9 @@ class compCalc
                 $this->db->query($query);
                 //echo "<pre>".$query."</pre>";
                 
-                if (mysql_num_rows($db->result) > 0)
+                if (mysql_num_rows($this->db->result) > 0)
                 {
-                    while($line = mysql_fetch_assoc($db->result))
+                    while($line = mysql_fetch_assoc($this->db->result))
                     {
                         $tempBuildID[$line["materialID"]] -= $line["quantity"];
                     }
@@ -187,7 +190,7 @@ class compCalc
                 $this->db->query($query);
                 //echo "<pre>".$query."</pre>";
 
-                while($line = mysql_fetch_assoc($db->result))
+                while($line = mysql_fetch_assoc($this->db->result))
                 {
                     $buildID[$line["materialID"]] += $line["quantity"] * $this->buildCount[$i];
                     $this->buildName[$line["materialID"]] = $line["materialName"];
@@ -213,7 +216,7 @@ class compCalc
                           AND t2.parentGroupID = t3.marketGroupID";
                 $this->db->query($query);
                 
-                $line = mysql_fetch_assoc($db->result);
+                $line = mysql_fetch_assoc($this->db->result);
                 $marketGroupName = trim($line["marketGroupName"]);
                 
                 switch($marketGroupName)
@@ -237,9 +240,11 @@ class compCalc
     function displayResult()
     {
         echo '<div style="float:right;">';
-        echo "<em>(Total: ";
+        echo "(Total: <em>";
         echo sizeof($this->minerals) + sizeof($this->components) + sizeof($this->tradeGoods) + sizeof($this->ram) + sizeof($this->t1Items);
-        echo ")</em>";
+        echo "</em>)";
+        echo "<br>";
+        echo "(Prints: <em>".(array_sum($this->buildCount) / 10)."</em>)";
         echo "</div>";
         
         echo "<u>Minerals</u> (".sizeof($this->minerals).") <br><br>";

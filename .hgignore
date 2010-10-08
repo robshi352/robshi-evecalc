@@ -1,3 +1,4 @@
 glob:website/bigdump.php
 relre:website/cachedir/*
 relre:activityTracker/cachedir/*
+glob:posTracker/cachedir/*
